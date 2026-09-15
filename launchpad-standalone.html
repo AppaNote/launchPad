@@ -5,7 +5,9 @@
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>LaunchPad</title>
 <style>
-:root{
+/* Aurora — default theme. Every theme below only re-declares these variables. */
+:root,
+[data-theme="aurora"]{
   --glass: rgba(255,255,255,.10);
   --glass-strong: rgba(255,255,255,.18);
   --stroke: rgba(255,255,255,.22);
@@ -13,8 +15,89 @@
   --muted: rgba(234,240,255,.62);
   --accent: #7fd3ff;
   --accent2: #b79bff;
+  --accent-soft: rgba(127,211,255,.18);
+  --on-accent: #06121c;
+  --page: #05070f;
+  --glow-a: rgba(127,211,255,.35);
+  --glow-b: rgba(183,155,255,.33);
+  --glow-c: rgba(74,255,206,.20);
+  --wash: linear-gradient(160deg,#070b16,#0b1020 45%,#070a14);
+  --sheen-1: rgba(255,255,255,.15);
+  --sheen-2: rgba(255,255,255,.055);
+  --sheen-hover: rgba(255,255,255,.26);
   --radius: 18px;
   --shadow: 0 10px 40px rgba(0,0,0,.35);
+}
+
+[data-theme="gold"]{
+  --glass: rgba(255,226,160,.10);
+  --glass-strong: rgba(255,226,160,.18);
+  --stroke: rgba(255,214,140,.28);
+  --text: #fbf1dc;
+  --muted: rgba(251,241,220,.62);
+  --accent: #f2c14e;
+  --accent2: #d9a01f;
+  --accent-soft: rgba(242,193,78,.20);
+  --on-accent: #241a05;
+  --page: #0d0a04;
+  --glow-a: rgba(242,193,78,.22);
+  --glow-b: rgba(198,138,26,.20);
+  --glow-c: rgba(255,226,160,.10);
+  --wash: linear-gradient(160deg,#0b0803,#130e04 45%,#070502);
+  --sheen-1: rgba(255,230,175,.17);
+  --sheen-2: rgba(255,230,175,.05);
+  --sheen-hover: rgba(255,230,175,.30);
+}
+
+[data-theme="emerald"]{
+  --glass: rgba(255,255,255,.10);
+  --glass-strong: rgba(255,255,255,.18);
+  --stroke: rgba(180,255,220,.22);
+  --text: #e6fff4;
+  --muted: rgba(230,255,244,.62);
+  --accent: #57e8ae;
+  --accent2: #29b6c9;
+  --accent-soft: rgba(87,232,174,.18);
+  --on-accent: #04150f;
+  --page: #040d0a;
+  --glow-a: rgba(87,232,174,.30);
+  --glow-b: rgba(41,182,201,.28);
+  --glow-c: rgba(120,255,214,.16);
+  --wash: linear-gradient(160deg,#05130f,#071a17 45%,#040f0c);
+}
+
+[data-theme="rose"]{
+  --glass: rgba(255,255,255,.10);
+  --glass-strong: rgba(255,255,255,.18);
+  --stroke: rgba(255,200,215,.24);
+  --text: #fdeaf1;
+  --muted: rgba(253,234,241,.62);
+  --accent: #ff9ec0;
+  --accent2: #c07bff;
+  --accent-soft: rgba(255,158,192,.18);
+  --on-accent: #1d0713;
+  --page: #0c050a;
+  --glow-a: rgba(255,158,192,.30);
+  --glow-b: rgba(192,123,255,.28);
+  --glow-c: rgba(255,214,120,.14);
+  --wash: linear-gradient(160deg,#150812,#1b0a18 45%,#0e0510);
+}
+
+[data-theme="slate"]{
+  --glass: rgba(255,255,255,.08);
+  --glass-strong: rgba(255,255,255,.14);
+  --stroke: rgba(255,255,255,.18);
+  --text: #e8ecf2;
+  --muted: rgba(232,236,242,.58);
+  --accent: #9fb4cc;
+  --accent2: #6d86a3;
+  --accent-soft: rgba(159,180,204,.18);
+  --on-accent: #0b1017;
+  --page: #080a0d;
+  --glow-a: rgba(159,180,204,.20);
+  --glow-b: rgba(109,134,163,.18);
+  --glow-c: rgba(255,255,255,.06);
+  --wash: linear-gradient(160deg,#0b0e13,#11151c 45%,#090b10);
 }
 
 *{box-sizing:border-box}
@@ -23,16 +106,16 @@ body{
   margin:0;
   font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
   color:var(--text);
-  background:#05070f;
+  background:var(--page);
   -webkit-font-smoothing:antialiased;
 }
 .bg{
   position:fixed; inset:0; z-index:-1;
   background:
-    radial-gradient(60vw 60vw at 12% 8%, rgba(127,211,255,.35), transparent 60%),
-    radial-gradient(55vw 55vw at 88% 12%, rgba(183,155,255,.33), transparent 60%),
-    radial-gradient(70vw 70vw at 50% 100%, rgba(74,255,206,.20), transparent 60%),
-    linear-gradient(160deg,#070b16,#0b1020 45%,#070a14);
+    radial-gradient(60vw 60vw at 12% 8%, var(--glow-a), transparent 60%),
+    radial-gradient(55vw 55vw at 88% 12%, var(--glow-b), transparent 60%),
+    radial-gradient(70vw 70vw at 50% 100%, var(--glow-c), transparent 60%),
+    var(--wash);
   filter:saturate(1.1);
 }
 .bg::after{
@@ -43,7 +126,7 @@ body{
 }
 
 .glass{
-  background:linear-gradient(180deg, rgba(255,255,255,.14), rgba(255,255,255,.06));
+  background:linear-gradient(180deg, var(--sheen-1), var(--sheen-2));
   border:1px solid var(--stroke);
   backdrop-filter: blur(22px) saturate(150%);
   -webkit-backdrop-filter: blur(22px) saturate(150%);
@@ -52,7 +135,7 @@ body{
 
 /* Top bar */
 .topbar{
-  position:sticky; top:12px; z-index:20;
+  position:sticky; top:12px; z-index:30; /* keeps the ··· menu above the quick links bar */
   margin:12px auto 0; max-width:1360px;
   display:flex; align-items:center; gap:16px;
   padding:10px 14px; border-radius:var(--radius);
@@ -70,7 +153,7 @@ body{
   transition:.2s;
 }
 .tab:hover{color:var(--text);background:rgba(255,255,255,.08)}
-.tab.active{color:#06121c;background:linear-gradient(135deg,var(--accent),var(--accent2));border-color:transparent}
+.tab.active{color:var(--on-accent);background:linear-gradient(135deg,var(--accent),var(--accent2));border-color:transparent}
 
 .top-actions{display:flex;align-items:center;gap:8px}
 .search{
@@ -78,14 +161,14 @@ body{
   background:rgba(255,255,255,.08);border:1px solid var(--stroke);outline:none;font-size:13px;
 }
 .search::placeholder{color:var(--muted)}
-.search:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(127,211,255,.18)}
+.search:focus{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-soft)}
 
 .btn{
   border-radius:12px;padding:8px 14px;cursor:pointer;font-size:13px;font-weight:600;
   border:1px solid var(--stroke);background:rgba(255,255,255,.08);color:var(--text);transition:.18s;
 }
 .btn:hover{background:rgba(255,255,255,.16);transform:translateY(-1px)}
-.btn.primary{background:linear-gradient(135deg,var(--accent),var(--accent2));color:#06121c;border-color:transparent}
+.btn.primary{background:linear-gradient(135deg,var(--accent),var(--accent2));color:var(--on-accent);border-color:transparent}
 .btn.ghost{background:transparent}
 .btn.danger:hover{background:rgba(255,105,120,.22);border-color:rgba(255,105,120,.5)}
 
@@ -93,6 +176,12 @@ body{
 .menu{position:absolute;right:0;top:44px;border-radius:14px;padding:6px;display:flex;flex-direction:column;min-width:190px;z-index:30}
 .menu button{background:transparent;border:0;color:var(--text);text-align:left;padding:9px 12px;border-radius:10px;cursor:pointer;font-size:13px}
 .menu button:hover{background:rgba(255,255,255,.12)}
+.menu-label{font-size:10.5px;letter-spacing:.7px;text-transform:uppercase;color:var(--muted);padding:8px 12px 4px;font-weight:600}
+.swatches{display:flex;gap:6px;padding:0 12px 10px;border-bottom:1px solid var(--stroke);margin-bottom:6px}
+.swatch{width:26px;height:26px;border-radius:50%;cursor:pointer;padding:0;
+  border:2px solid transparent;box-shadow:0 0 0 1px var(--stroke);transition:.18s}
+.swatch:hover{transform:scale(1.08)}
+.swatch.active{border-color:var(--text);box-shadow:0 0 0 1px var(--text)}
 
 /* Quick links */
 .quicklinks{
@@ -141,7 +230,7 @@ main{max-width:1360px;margin:0 auto;padding:18px 12px 60px}
 .arrow{
   flex:0 0 auto;width:46px;height:92px;border-radius:16px;cursor:pointer;font-size:20px;
   color:var(--text);border:1px solid var(--stroke);
-  background:linear-gradient(180deg,rgba(255,255,255,.14),rgba(255,255,255,.05));
+  background:linear-gradient(180deg,var(--sheen-1),var(--sheen-2));
   backdrop-filter:blur(18px); transition:.18s;
 }
 .arrow:hover{background:rgba(255,255,255,.2);transform:scale(1.03)}
@@ -159,7 +248,7 @@ main{max-width:1360px;margin:0 auto;padding:18px 12px 60px}
 .tile{
   position:relative;aspect-ratio:1/.82;border-radius:16px;cursor:pointer;overflow:hidden;
   display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;
-  background:linear-gradient(180deg,rgba(255,255,255,.16),rgba(255,255,255,.05));
+  background:linear-gradient(180deg,var(--sheen-1),var(--sheen-2));
   border:1px solid var(--stroke);
   box-shadow:inset 0 1px 0 rgba(255,255,255,.3), 0 6px 18px rgba(0,0,0,.28);
   transition:transform .18s, box-shadow .18s, background .18s;
@@ -169,7 +258,7 @@ main{max-width:1360px;margin:0 auto;padding:18px 12px 60px}
   background:linear-gradient(180deg,rgba(255,255,255,.35),transparent);
   transform:rotate(-8deg);pointer-events:none;
 }
-.tile:hover{transform:translateY(-3px) scale(1.02);background:linear-gradient(180deg,rgba(255,255,255,.26),rgba(255,255,255,.08))}
+.tile:hover{transform:translateY(-3px) scale(1.02);background:linear-gradient(180deg,var(--sheen-hover),var(--sheen-2))}
 .tile .glyph{width:30px;height:30px;color:var(--accent);opacity:.95}
 .tile .glyph svg{width:100%;height:100%}
 .tile.add .glyph{color:var(--muted)}
@@ -197,21 +286,26 @@ main{max-width:1360px;margin:0 auto;padding:18px 12px 60px}
   border:1px solid var(--stroke);background:rgba(255,255,255,.06);transition:.18s;
 }
 .chip:hover{color:var(--text)}
-.chip.active{color:#06121c;background:linear-gradient(135deg,var(--accent),var(--accent2));border-color:transparent}
+.chip.active{color:var(--on-accent);background:linear-gradient(135deg,var(--accent),var(--accent2));border-color:transparent}
 
 /* Cards */
 .cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(310px,1fr));gap:14px}
 .card{border-radius:var(--radius);padding:14px 16px;position:relative;transition:.18s;
-  background:linear-gradient(180deg,rgba(255,255,255,.13),rgba(255,255,255,.05));
+  background:linear-gradient(180deg,var(--sheen-1),var(--sheen-2));
   border:1px solid var(--stroke);backdrop-filter:blur(18px);
   box-shadow:inset 0 1px 0 rgba(255,255,255,.25), 0 6px 20px rgba(0,0,0,.25);
 }
 .card:hover{transform:translateY(-2px);border-color:rgba(255,255,255,.4)}
 .card h4{margin:0 0 6px;font-size:15px;font-weight:650;padding-right:64px}
 .card .tagrow{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:8px}
+/* Tag tints follow the theme accents; the rgba lines are the fallback for browsers without color-mix. */
 .tag{font-size:10.5px;letter-spacing:.6px;text-transform:uppercase;padding:3px 9px;border-radius:999px;
-  background:rgba(127,211,255,.16);border:1px solid rgba(127,211,255,.35);color:var(--accent)}
-.tag.alt{background:rgba(183,155,255,.16);border-color:rgba(183,155,255,.35);color:var(--accent2)}
+  background:rgba(255,255,255,.10);border:1px solid var(--stroke);color:var(--accent);
+  background:color-mix(in srgb, var(--accent) 16%, transparent);
+  border-color:color-mix(in srgb, var(--accent) 35%, transparent)}
+.tag.alt{color:var(--accent2);
+  background:color-mix(in srgb, var(--accent2) 16%, transparent);
+  border-color:color-mix(in srgb, var(--accent2) 35%, transparent)}
 .kv{display:flex;gap:8px;font-size:13px;margin:3px 0;color:var(--muted)}
 .kv b{color:var(--text);font-weight:600;min-width:74px;font-size:12px;text-transform:uppercase;letter-spacing:.4px;opacity:.7}
 .kv span{word-break:break-all}
@@ -224,7 +318,7 @@ main{max-width:1360px;margin:0 auto;padding:18px 12px 60px}
 .res-card{padding:0;overflow:hidden;cursor:pointer;display:flex;flex-direction:column}
 .res-card .thumb{
   position:relative;aspect-ratio:16/9;overflow:hidden;
-  background:linear-gradient(135deg,rgba(127,211,255,.22),rgba(183,155,255,.22));
+  background:linear-gradient(135deg, var(--accent-soft), var(--glass-strong));
   border-bottom:1px solid var(--stroke);
 }
 .res-card .thumb img{width:100%;height:100%;object-fit:cover;display:block;transition:transform .35s}
@@ -259,8 +353,8 @@ main{max-width:1360px;margin:0 auto;padding:18px 12px 60px}
   background:rgba(255,255,255,.08);color:var(--text);font-size:14px;outline:none;font-family:inherit;
 }
 .field textarea{min-height:76px;resize:vertical}
-.field input:focus,.field select:focus,.field textarea:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(127,211,255,.18)}
-.field select option{background:#0b1020}
+.field input:focus,.field select:focus,.field textarea:focus{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-soft)}
+.field select option{background:var(--page)}
 .icon-preview{width:34px;height:34px;color:var(--accent);margin-top:2px}
 .icon-preview svg{width:100%;height:100%}
 .row2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
@@ -295,6 +389,8 @@ main{max-width:1360px;margin:0 auto;padding:18px 12px 60px}
     <div class="menu-wrap">
       <button id="moreBtn" class="btn ghost" title="More">···</button>
       <div id="moreMenu" class="menu glass hidden">
+        <div class="menu-label">Theme</div>
+        <div class="swatches" id="themePicker"></div>
         <button data-action="export">Export backup (.json)</button>
         <button data-action="import">Import backup…</button>
         <button data-action="reset">Reset to defaults</button>
@@ -353,6 +449,16 @@ main{max-width:1360px;margin:0 auto;padding:18px 12px 60px}
 
 const STORE_KEY = 'launchpad.v1';
 const ENVS_PER_PAGE = 2;
+
+/* Themes are pure CSS variable sets; the swatch colours mirror --accent/--accent2. */
+const THEMES = [
+  { id: 'aurora',  name: 'Aurora',  colors: ['#7fd3ff', '#b79bff'] },
+  { id: 'gold',    name: 'Gold',    colors: ['#f2c14e', '#d9a01f'] },
+  { id: 'emerald', name: 'Emerald', colors: ['#57e8ae', '#29b6c9'] },
+  { id: 'rose',    name: 'Rose',    colors: ['#ff9ec0', '#c07bff'] },
+  { id: 'slate',   name: 'Slate',   colors: ['#9fb4cc', '#6d86a3'] }
+];
+const DEFAULT_THEME = 'aurora';
 
 const uid = () => Math.random().toString(36).slice(2, 10) + Date.now().toString(36);
 
@@ -426,7 +532,8 @@ function defaults() {
       { id: uid(), name: 'System Integration (SIT)',     short: 'SIT',     tiles: tiles() }
     ],
     databases: [],
-    resources: []
+    resources: [],
+    theme: DEFAULT_THEME
   };
 }
 
@@ -446,7 +553,8 @@ function load() {
       quickLinks: (data.quickLinks || []).map(normalizeQuickLink),
       environments: data.environments || [],
       databases: data.databases || [],
-      resources: data.resources || []
+      resources: data.resources || [],
+      theme: THEMES.some((t) => t.id === data.theme) ? data.theme : DEFAULT_THEME
     };
   } catch (e) {
     console.error('Could not read saved data, starting fresh copy in memory.', e);
@@ -586,6 +694,30 @@ async function enrichResource(r) {
 function matches(...parts) {
   if (!query) return true;
   return parts.filter(Boolean).join(' ').toLowerCase().includes(query);
+}
+
+/* ---------- theme ---------- */
+function applyTheme() {
+  document.documentElement.dataset.theme = state.theme || DEFAULT_THEME;
+  renderThemePicker();
+}
+function renderThemePicker() {
+  const wrap = $('#themePicker');
+  if (!wrap) return;
+  wrap.innerHTML = '';
+  THEMES.forEach((t) => {
+    const b = el('button', 'swatch' + (t.id === state.theme ? ' active' : ''));
+    b.type = 'button';
+    b.title = t.name;
+    b.style.background = `linear-gradient(135deg, ${t.colors[0]}, ${t.colors[1]})`;
+    b.addEventListener('click', (e) => {
+      e.stopPropagation();
+      state.theme = t.id;
+      save();
+      applyTheme();
+    });
+    wrap.appendChild(b);
+  });
 }
 
 /* ---------- rendering ---------- */
@@ -1110,9 +1242,11 @@ function importData(file) {
         quickLinks: (data.quickLinks || []).map(normalizeQuickLink),
         environments: data.environments || [],
         databases: data.databases || [],
-        resources: data.resources || []
+        resources: data.resources || [],
+        theme: THEMES.some((t) => t.id === data.theme) ? data.theme : state.theme
       };
       page = 0;
+      applyTheme();
       save(); render(); toast('Backup imported');
     } catch (e) {
       toast('That file is not a valid backup');
@@ -1164,7 +1298,8 @@ $('#moreMenu').addEventListener('click', (e) => {
   if (a === 'import') $('#importFile').click();
   if (a === 'reset') {
     if (confirm('Replace everything with the default layout? Export a backup first if unsure.')) {
-      state = defaults(); page = 0; save(); render();
+      const theme = state.theme;
+      state = defaults(); state.theme = theme; page = 0; save(); applyTheme(); render();
     }
   }
 });
@@ -1173,6 +1308,7 @@ $('#importFile').addEventListener('change', (e) => {
   e.target.value = '';
 });
 
+applyTheme();
 save();
 render();
 

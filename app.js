@@ -4,6 +4,16 @@
 const STORE_KEY = 'launchpad.v1';
 const ENVS_PER_PAGE = 2;
 
+/* Themes are pure CSS variable sets; the swatch colours mirror --accent/--accent2. */
+const THEMES = [
+  { id: 'aurora',  name: 'Aurora',  colors: ['#7fd3ff', '#b79bff'] },
+  { id: 'gold',    name: 'Gold',    colors: ['#f2c14e', '#d9a01f'] },
+  { id: 'emerald', name: 'Emerald', colors: ['#57e8ae', '#29b6c9'] },
+  { id: 'rose',    name: 'Rose',    colors: ['#ff9ec0', '#c07bff'] },
+  { id: 'slate',   name: 'Slate',   colors: ['#9fb4cc', '#6d86a3'] }
+];
+const DEFAULT_THEME = 'aurora';
+
 const uid = () => Math.random().toString(36).slice(2, 10) + Date.now().toString(36);
 
 /* Inline SVG icon set (stroke = currentColor) so tiles look identical on every OS. */
@@ -76,7 +86,8 @@ function defaults() {
       { id: uid(), name: 'System Integration (SIT)',     short: 'SIT',     tiles: tiles() }
     ],
     databases: [],
-    resources: []
+    resources: [],
+    theme: DEFAULT_THEME
   };
 }
 
@@ -96,7 +107,8 @@ function load() {
       quickLinks: (data.quickLinks || []).map(normalizeQuickLink),
       environments: data.environments || [],
       databases: data.databases || [],
-      resources: data.resources || []
+      resources: data.resources || [],
+      theme: THEMES.some((t) => t.id === data.theme) ? data.theme : DEFAULT_THEME
     };
   } catch (e) {
     console.error('Could not read saved data, starting fresh copy in memory.', e);
@@ -236,6 +248,30 @@ async function enrichResource(r) {
 function matches(...parts) {
   if (!query) return true;
   return parts.filter(Boolean).join(' ').toLowerCase().includes(query);
+}
+
+/* ---------- theme ---------- */
+function applyTheme() {
+  document.documentElement.dataset.theme = state.theme || DEFAULT_THEME;
+  renderThemePicker();
+}
+function renderThemePicker() {
+  const wrap = $('#themePicker');
+  if (!wrap) return;
+  wrap.innerHTML = '';
+  THEMES.forEach((t) => {
+    const b = el('button', 'swatch' + (t.id === state.theme ? ' active' : ''));
+    b.type = 'button';
+    b.title = t.name;
+    b.style.background = `linear-gradient(135deg, ${t.colors[0]}, ${t.colors[1]})`;
+    b.addEventListener('click', (e) => {
+      e.stopPropagation();
+      state.theme = t.id;
+      save();
+      applyTheme();
+    });
+    wrap.appendChild(b);
+  });
 }
 
 /* ---------- rendering ---------- */
@@ -760,9 +796,11 @@ function importData(file) {
         quickLinks: (data.quickLinks || []).map(normalizeQuickLink),
         environments: data.environments || [],
         databases: data.databases || [],
-        resources: data.resources || []
+        resources: data.resources || [],
+        theme: THEMES.some((t) => t.id === data.theme) ? data.theme : state.theme
       };
       page = 0;
+      applyTheme();
       save(); render(); toast('Backup imported');
     } catch (e) {
       toast('That file is not a valid backup');
@@ -814,7 +852,8 @@ $('#moreMenu').addEventListener('click', (e) => {
   if (a === 'import') $('#importFile').click();
   if (a === 'reset') {
     if (confirm('Replace everything with the default layout? Export a backup first if unsure.')) {
-      state = defaults(); page = 0; save(); render();
+      const theme = state.theme;
+      state = defaults(); state.theme = theme; page = 0; save(); applyTheme(); render();
     }
   }
 });
@@ -823,5 +862,6 @@ $('#importFile').addEventListener('change', (e) => {
   e.target.value = '';
 });
 
+applyTheme();
 save();
 render();
