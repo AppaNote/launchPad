@@ -55,15 +55,19 @@ function defaults() {
   ];
   return {
     quickLinks: [
-      { id: uid(), name: 'Intranet', url: '' },
-      { id: uid(), name: 'Finance SharePoint', url: '' },
-      { id: uid(), name: 'HP UFT', url: '' },
-      { id: uid(), name: 'Lawson Codes', url: '' },
-      { id: uid(), name: 'Email', url: '' },
-      { id: uid(), name: 'IT Wiki', url: '' },
-      { id: uid(), name: 'IT Enterprise Tools', url: '' },
-      { id: uid(), name: 'Power Automate', url: '' },
-      { id: uid(), name: 'UnMingle', url: '' }
+      { id: uid(), name: 'SharePoint', url: '', items: [
+        { id: uid(), name: 'Team site', url: '' },
+        { id: uid(), name: 'Finance', url: '' }
+      ] },
+      { id: uid(), name: 'Azure DevOps', url: '', items: [
+        { id: uid(), name: 'Boards', url: '' },
+        { id: uid(), name: 'Repos', url: '' },
+        { id: uid(), name: 'Pipelines', url: '' }
+      ] },
+      { id: uid(), name: 'Intranet', url: '', items: [] },
+      { id: uid(), name: 'Email', url: '', items: [] },
+      { id: uid(), name: 'IT Wiki', url: '', items: [] },
+      { id: uid(), name: 'Power Automate', url: '', items: [] }
     ],
     environments: [
       { id: uid(), name: 'Production (PROD)',            short: 'PROD',    tiles: tiles() },
@@ -89,7 +93,7 @@ function load() {
     if (!raw) return defaults();
     const data = JSON.parse(raw);
     return {
-      quickLinks: data.quickLinks || [],
+      quickLinks: (data.quickLinks || []).map(normalizeQuickLink),
       environments: data.environments || [],
       databases: data.databases || [],
       resources: data.resources || []
@@ -101,6 +105,26 @@ function load() {
 }
 function save() {
   localStorage.setItem(STORE_KEY, JSON.stringify(state));
+}
+
+/* A quick link is a group: it can open its own URL and/or hold child links. */
+function normalizeQuickLink(q) {
+  return {
+    id: q.id || uid(),
+    name: q.name || '',
+    url: q.url || '',
+    items: (Array.isArray(q.items) ? q.items : []).map((i) => ({ id: i.id || uid(), name: i.name || '', url: i.url || '' }))
+  };
+}
+function findQuickGroup(id) {
+  return state.quickLinks.find((g) => g.id === id) || null;
+}
+function findQuickItem(id) {
+  for (const g of state.quickLinks) {
+    const it = g.items.find((i) => i.id === id);
+    if (it) return { group: g, item: it };
+  }
+  return null;
 }
 
 /* ---------- helpers ---------- */
@@ -225,27 +249,64 @@ function render() {
 function renderQuickLinks() {
   const wrap = $('#quickLinks');
   wrap.innerHTML = '';
-  state.quickLinks.forEach((q) => {
-    const a = el('a', 'qlink');
-    a.href = normalizeUrl(q.url) || '#';
-    a.target = '_blank';
-    a.rel = 'noopener';
-    a.innerHTML = `<span>${esc(q.name)}</span>
-      <button class="mini" data-edit="${q.id}" title="Edit">${UI.edit}</button>
-      <button class="mini" data-del="${q.id}" title="Delete">${UI.trash}</button>`;
-    a.addEventListener('click', (e) => {
-      const b = e.target.closest('button');
-      e.preventDefault();
-      if (b && b.dataset.edit) return openModal('quickLink', q);
-      if (b && b.dataset.del) return removeItem('quickLinks', q.id, q.name);
-      openUrl(q.url);
-    });
-    wrap.appendChild(a);
-  });
-  const add = el('button', 'qlink', '+ link');
-  add.style.cursor = 'pointer';
+  state.quickLinks.forEach((g) => wrap.appendChild(quickLinkGroup(g)));
+  const add = el('button', 'qlink add', '+ link');
   add.addEventListener('click', () => openModal('quickLink'));
   wrap.appendChild(add);
+}
+
+function quickLinkGroup(g) {
+  const grp = el('div', 'qgroup');
+
+  const chip = el('button', 'qlink');
+  chip.innerHTML = `<span>${esc(g.name)}</span>
+    ${g.items.length ? '<span class="caret">&#9662;</span>' : ''}
+    <span class="mini" data-a="edit" title="Edit group">${UI.edit}</span>
+    <span class="mini" data-a="del" title="Delete group">${UI.trash}</span>`;
+  grp.appendChild(chip);
+
+  const menu = el('div', 'qmenu glass');
+  g.items.forEach((it) => {
+    const row = el('button', 'qitem');
+    row.innerHTML = `<span class="qitem-name">${esc(it.name)}</span>
+      <span class="mini" data-a="edit-item" data-id="${it.id}" title="Edit">${UI.edit}</span>
+      <span class="mini" data-a="del-item" data-id="${it.id}" title="Delete">${UI.trash}</span>`;
+    row.dataset.a = 'open-item';
+    row.dataset.id = it.id;
+    if (it.url) row.title = normalizeUrl(it.url);
+    menu.appendChild(row);
+  });
+  const addItem = el('button', 'qitem add', '+ Add link');
+  addItem.dataset.a = 'add-item';
+  menu.appendChild(addItem);
+  grp.appendChild(menu);
+
+  grp.addEventListener('click', (e) => {
+    const hit = e.target.closest('[data-a]');
+    const a = hit?.dataset.a;
+    if (a === 'edit') return openModal('quickLink', g);
+    if (a === 'del') return removeItem('quickLinks', g.id, g.name);
+    if (a === 'add-item') return openModal('quickSubLink', null, { parentId: g.id });
+    if (a === 'edit-item') return openModal('quickSubLink', findQuickItem(hit.dataset.id)?.item, { parentId: g.id });
+    if (a === 'del-item') return removeQuickItem(g, hit.dataset.id);
+    if (a === 'open-item') {
+      const it = g.items.find((i) => i.id === hit.dataset.id);
+      return openUrl(it?.url);
+    }
+    if (g.url) return openUrl(g.url);
+    if (g.items.length) grp.classList.toggle('open');
+    else toast('No URL set — use Edit to add one.');
+  });
+  grp.addEventListener('mouseleave', () => grp.classList.remove('open'));
+
+  return grp;
+}
+
+function removeQuickItem(group, id) {
+  const it = group.items.find((i) => i.id === id);
+  if (!it || !confirm(`Delete "${it.name}" from ${group.name}?`)) return;
+  group.items = group.items.filter((i) => i.id !== id);
+  save(); renderQuickLinks(); toast('Deleted');
 }
 
 function pageCount() {
@@ -493,10 +554,18 @@ const SCHEMAS = {
     ]
   },
   quickLink: {
-    title: 'Quick link',
+    title: 'Quick link group',
     fields: [
-      { k: 'name', label: 'Name', required: true, placeholder: 'IT Wiki' },
-      { k: 'url', label: 'URL', placeholder: 'https://…', full: true }
+      { k: 'name', label: 'Name', required: true, placeholder: 'SharePoint' },
+      { k: 'url', label: 'URL', placeholder: 'Optional — leave blank for a hover menu only', full: true }
+    ]
+  },
+  quickSubLink: {
+    title: 'Link in a group',
+    fields: [
+      { k: 'parentId', label: 'Group', type: 'select', options: () => state.quickLinks.map((g) => ({ v: g.id, t: g.name })), required: true },
+      { k: 'name', label: 'Name', required: true, placeholder: 'Finance SharePoint' },
+      { k: 'url', label: 'URL', required: true, placeholder: 'https://…', full: true }
     ]
   },
   database: {
@@ -602,7 +671,8 @@ function openChooser() {
   const opts = [
     ['tile', 'Launcher tile', 'A button inside an environment'],
     ['environment', 'Environment', 'A new environment page panel (PROD, UAT, …)'],
-    ['quickLink', 'Quick link', 'Top bar link: SharePoint, Intranet, IT Wiki…'],
+    ['quickLink', 'Quick link group', 'Top bar entry: SharePoint, Azure DevOps, Intranet…'],
+    ['quickSubLink', 'Link in a group', 'One site inside a top bar hover menu'],
     ['database', 'Database', 'Server + database name per environment'],
     ['resource', 'Resource', 'Blog post, YouTube video, docs…']
   ];
@@ -643,11 +713,25 @@ function saveModal() {
     } else {
       targetEnv.tiles.push({ id: uid(), label: values.label, sub: values.sub, icon: values.icon, url: values.url });
     }
+  } else if (kind === 'quickLink') {
+    if (item) Object.assign(item, { name: values.name, url: values.url });
+    else state.quickLinks.push(normalizeQuickLink({ name: values.name, url: values.url }));
+  } else if (kind === 'quickSubLink') {
+    const target = findQuickGroup(values.parentId);
+    if (!target) return toast('Pick a group');
+    if (item) {
+      const owner = findQuickItem(item.id)?.group;
+      if (owner && owner !== target) owner.items = owner.items.filter((i) => i.id !== item.id);
+      Object.assign(item, { name: values.name, url: values.url });
+      if (!target.items.includes(item)) target.items.push(item);
+    } else {
+      target.items.push({ id: uid(), name: values.name, url: values.url });
+    }
   } else if (kind === 'environment') {
     if (item) Object.assign(item, { name: values.name, short: values.short });
     else state.environments.push({ id: uid(), name: values.name, short: values.short, tiles: [] });
   } else {
-    const key = { quickLink: 'quickLinks', database: 'databases', resource: 'resources' }[kind];
+    const key = { database: 'databases', resource: 'resources' }[kind];
     if (item) Object.assign(item, values);
     else state[key].push({ id: uid(), ...values });
   }
@@ -673,7 +757,7 @@ function importData(file) {
     try {
       const data = JSON.parse(reader.result);
       state = {
-        quickLinks: data.quickLinks || [],
+        quickLinks: (data.quickLinks || []).map(normalizeQuickLink),
         environments: data.environments || [],
         databases: data.databases || [],
         resources: data.resources || []

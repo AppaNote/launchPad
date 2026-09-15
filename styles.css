@@ -91,17 +91,40 @@ body{
 .quicklinks{
   max-width:1360px;margin:12px auto 0;padding:8px 12px;border-radius:var(--radius);
   display:flex;gap:6px;flex-wrap:wrap;align-items:center;
+  position:relative;z-index:25; /* hover menus must sit above the launcher panels */
 }
 .qlink{
   display:inline-flex;align-items:center;gap:8px;padding:6px 12px;border-radius:11px;
   color:var(--muted);text-decoration:none;font-size:13px;border:1px solid transparent;transition:.18s;
 }
-button.qlink{background:transparent;border:1px dashed var(--stroke);cursor:pointer;font:inherit;font-size:13px;color:var(--muted)}
+button.qlink{background:transparent;cursor:pointer;font:inherit;font-size:13px;color:var(--muted)}
+button.qlink.add{border:1px dashed var(--stroke)}
 .qlink:hover{color:var(--text);background:rgba(255,255,255,.12);border-color:var(--stroke)}
 .qlink .mini{opacity:0;font-size:11px;transition:.18s}
 .qlink:hover .mini{opacity:.8}
 .mini{background:transparent;border:0;color:inherit;cursor:pointer;padding:0;display:inline-grid;place-items:center}
 .mini svg{width:13px;height:13px}
+
+.qgroup{position:relative}
+.qgroup .caret{font-size:10px;opacity:.7}
+.qmenu{
+  display:none;position:absolute;left:0;top:100%;margin-top:4px;z-index:40;
+  min-width:210px;max-height:60vh;overflow:auto;padding:6px;border-radius:14px;
+  flex-direction:column;gap:2px;
+  background:linear-gradient(180deg, rgba(26,32,54,.96), rgba(16,20,36,.96));
+  box-shadow:var(--shadow);
+}
+.qgroup:hover .qmenu,.qgroup.open .qmenu{display:flex}
+.qitem{
+  display:flex;align-items:center;gap:8px;width:100%;text-align:left;
+  background:transparent;border:0;color:var(--text);font:inherit;font-size:13px;
+  padding:8px 10px;border-radius:10px;cursor:pointer;
+}
+.qitem:hover{background:rgba(255,255,255,.12)}
+.qitem-name{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.qitem .mini{opacity:0}
+.qitem:hover .mini{opacity:.8}
+.qitem.add{color:var(--muted);border:1px dashed var(--stroke);margin-top:4px;justify-content:center}
 
 main{max-width:1360px;margin:0 auto;padding:18px 12px 60px}
 .view.hidden,.hidden{display:none !important}

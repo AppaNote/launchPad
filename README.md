@@ -20,7 +20,7 @@ Everything is stored in your browser's `localStorage` under the key `launchpad.v
 - **Resources** — visual link cards instead of raw URLs: YouTube/Vimeo links show the video thumbnail and a play badge, other links show a favicon + domain badge over a gradient monogram tile. Category + tag filters; clicking a card opens the link.
   - Leave **Title** blank and it is derived from the link (URL slug, or the `q=` search term). YouTube/Vimeo titles and thumbnails are pulled from their CORS-enabled oEmbed endpoints on first render and then cached in your saved data; if the network blocks it, the derived title stays.
   - Any other site cannot be read cross-origin from a file:// page, so paste a **Thumbnail URL** manually if you want a custom image.
-- **Quick links bar** — the top row (Intranet, IT Wiki, Power Automate, …), each editable/deletable.
+- **Quick links bar** — the top row is a set of groups (SharePoint, Azure DevOps, Intranet, …). Hovering a group drops down its links, so one SharePoint entry can hold every site you use; click a group with no children to open its own URL. Groups and their links each have edit/delete, and `+ Add link` inside a menu adds to that group.
 - Global **+ Add** button, search across the active tab, JSON export/import, reset to defaults.
 
 ## Files
