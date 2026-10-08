@@ -7,19 +7,43 @@
 <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
-<div class="bg"></div>
+<div class="bg" id="bg"></div>
 
-<header class="topbar glass">
+<div class="shell">
+<aside class="sidebar glass">
   <div class="brand">
     <span class="dot"></span>
     <h1>LaunchPad</h1>
   </div>
 
   <nav class="tabs" id="tabs">
-    <button class="tab active" data-view="launcher">Launcher</button>
-    <button class="tab" data-view="databases">Databases</button>
-    <button class="tab" data-view="resources">Resources</button>
+    <button class="tab active" data-view="launcher" data-icon="grid">Launcher</button>
+    <button class="tab" data-view="databases" data-icon="database">Databases</button>
+    <button class="tab" data-view="resources" data-icon="book">Resources</button>
   </nav>
+
+  <div class="appearance">
+    <div class="menu-label">Theme</div>
+    <div class="swatches" id="themePicker"></div>
+    <div class="menu-label">Background</div>
+    <div class="bg-actions">
+      <button class="btn small" id="bgUpload" type="button">Upload</button>
+      <button class="btn small" id="bgUrl" type="button">URL</button>
+      <button class="btn small ghost" id="bgClear" type="button" title="Remove background image">&times;</button>
+    </div>
+    <label class="slider">
+      <span>Blur</span>
+      <input type="range" id="bgBlur" min="0" max="24" step="1" />
+    </label>
+  </div>
+</aside>
+
+<div class="content">
+<header class="topbar">
+  <div class="greeting">
+    <h2 id="greeting">Welcome back</h2>
+    <p id="subGreeting">Here's your workspace.</p>
+  </div>
 
   <div class="top-actions">
     <input id="search" class="search" type="search" placeholder="Search…" autocomplete="off" />
@@ -27,8 +51,6 @@
     <div class="menu-wrap">
       <button id="moreBtn" class="btn ghost" title="More">···</button>
       <div id="moreMenu" class="menu glass hidden">
-        <div class="menu-label">Theme</div>
-        <div class="swatches" id="themePicker"></div>
         <button data-action="export">Export backup (.json)</button>
         <button data-action="import">Import backup…</button>
         <button data-action="reset">Reset to defaults</button>
@@ -36,6 +58,8 @@
     </div>
   </div>
 </header>
+
+<div class="stats" id="stats"></div>
 
 <div class="quicklinks glass" id="quickLinks"></div>
 
@@ -62,6 +86,8 @@
     <div class="cards" id="resList"></div>
   </section>
 </main>
+</div>
+</div>
 
 <!-- Modal -->
 <div class="overlay hidden" id="overlay">
@@ -80,6 +106,7 @@
 
 <div id="toast" class="toast hidden"></div>
 <input type="file" id="importFile" accept="application/json" class="hidden" />
+<input type="file" id="bgFile" accept="image/*" class="hidden" />
 
 <script src="app.js"></script>
 </body>

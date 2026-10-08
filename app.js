@@ -2,6 +2,9 @@
    All data lives in localStorage and is never removed unless the user deletes it. */
 
 const STORE_KEY = 'launchpad.v1';
+/* Background photo is kept under its own key so a large image can never block saving the main data. */
+const BG_KEY = 'launchpad.bg';
+const BG_MAX_SIDE = 1920;
 const ENVS_PER_PAGE = 2;
 
 /* Themes are pure CSS variable sets; the swatch colours mirror --accent/--accent2. */
@@ -97,6 +100,7 @@ let view = 'launcher';
 let dbFilter = 'All';
 let resFilter = 'All';
 let query = '';
+let bg = loadBg();
 
 function load() {
   try {
@@ -274,12 +278,93 @@ function renderThemePicker() {
   });
 }
 
+/* ---------- background ---------- */
+function loadBg() {
+  try {
+    const data = JSON.parse(localStorage.getItem(BG_KEY) || '{}');
+    return { src: data.src || '', blur: Number(data.blur) || 0 };
+  } catch (e) {
+    return { src: '', blur: 0 };
+  }
+}
+function saveBg() {
+  try {
+    localStorage.setItem(BG_KEY, JSON.stringify(bg));
+    return true;
+  } catch (e) {
+    toast('Image is too large to save — try a smaller one');
+    return false;
+  }
+}
+function applyBackground() {
+  document.body.classList.toggle('has-image', !!bg.src);
+  const node = $('#bg');
+  node.style.setProperty('--bg-image', bg.src ? `url("${bg.src.replace(/"/g, '%22')}")` : 'none');
+  node.style.setProperty('--bg-blur', bg.blur + 'px');
+  $('#bgBlur').value = bg.blur;
+}
+function setBackground(src) {
+  const prev = bg.src;
+  bg.src = src;
+  if (!saveBg()) bg.src = prev;
+  applyBackground();
+}
+/* Uploaded photos are downscaled to JPEG so they fit comfortably in localStorage. */
+function imageFileToDataUrl(file) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onerror = reject;
+    reader.onload = () => {
+      const img = new Image();
+      img.onerror = reject;
+      img.onload = () => {
+        const scale = Math.min(1, BG_MAX_SIDE / Math.max(img.width, img.height));
+        const canvas = document.createElement('canvas');
+        canvas.width = Math.round(img.width * scale);
+        canvas.height = Math.round(img.height * scale);
+        canvas.getContext('2d').drawImage(img, 0, 0, canvas.width, canvas.height);
+        resolve(canvas.toDataURL('image/jpeg', 0.82));
+      };
+      img.src = reader.result;
+    };
+    reader.readAsDataURL(file);
+  });
+}
+
 /* ---------- rendering ---------- */
 function render() {
+  renderGreeting();
+  renderStats();
   renderQuickLinks();
   if (view === 'launcher') renderLauncher();
   if (view === 'databases') renderDatabases();
   if (view === 'resources') renderResources();
+}
+
+function renderGreeting() {
+  const h = new Date().getHours();
+  $('#greeting').textContent = h < 12 ? 'Good morning' : h < 18 ? 'Good afternoon' : 'Good evening';
+  $('#subGreeting').textContent = new Date().toLocaleDateString(undefined,
+    { weekday: 'long', month: 'long', day: 'numeric' }) + ' · here’s your workspace.';
+}
+
+function renderStats() {
+  const wrap = $('#stats');
+  wrap.innerHTML = '';
+  const tiles = state.environments.reduce((n, e) => n + e.tiles.length, 0);
+  [
+    ['Environments', state.environments.length, 'cloud', 'launcher'],
+    ['Launch tiles', tiles, 'grid', 'launcher'],
+    ['Databases', state.databases.length, 'database', 'databases'],
+    ['Resources', state.resources.length, 'book', 'resources']
+  ].forEach(([label, value, icon, target]) => {
+    const b = el('button', 'stat glass');
+    b.type = 'button';
+    b.innerHTML = `<span class="ic">${iconHtml(icon)}</span>
+      <span><span class="k">${esc(label)}</span><span class="v">${value}</span></span>`;
+    b.addEventListener('click', () => setView(target));
+    wrap.appendChild(b);
+  });
 }
 
 function renderQuickLinks() {
@@ -780,7 +865,7 @@ function saveModal() {
 
 /* ---------- backup ---------- */
 function exportData() {
-  const blob = new Blob([JSON.stringify(state, null, 2)], { type: 'application/json' });
+  const blob = new Blob([JSON.stringify({ ...state, background: bg }, null, 2)], { type: 'application/json' });
   const a = el('a');
   a.href = URL.createObjectURL(blob);
   a.download = `launchpad-backup-${new Date().toISOString().slice(0, 10)}.json`;
@@ -800,6 +885,11 @@ function importData(file) {
         theme: THEMES.some((t) => t.id === data.theme) ? data.theme : state.theme
       };
       page = 0;
+      if (data.background && typeof data.background.src === 'string') {
+        bg = { src: data.background.src, blur: Number(data.background.blur) || 0 };
+        saveBg();
+        applyBackground();
+      }
       applyTheme();
       save(); render(); toast('Backup imported');
     } catch (e) {
@@ -810,14 +900,39 @@ function importData(file) {
 }
 
 /* ---------- wiring ---------- */
-$('#tabs').addEventListener('click', (e) => {
-  const b = e.target.closest('.tab');
-  if (!b) return;
-  view = b.dataset.view;
-  document.querySelectorAll('.tab').forEach((t) => t.classList.toggle('active', t === b));
+function setView(next) {
+  view = next;
+  document.querySelectorAll('.tab').forEach((t) => t.classList.toggle('active', t.dataset.view === view));
   document.querySelectorAll('.view').forEach((v) => v.classList.toggle('hidden', v.id !== 'view-' + view));
   render();
+}
+document.querySelectorAll('.tab').forEach((b) =>
+  b.insertAdjacentHTML('afterbegin', `<span class="tab-ic">${iconHtml(b.dataset.icon)}</span>`));
+$('#tabs').addEventListener('click', (e) => {
+  const b = e.target.closest('.tab');
+  if (b) setView(b.dataset.view);
 });
+$('#bgUpload').addEventListener('click', () => $('#bgFile').click());
+$('#bgFile').addEventListener('change', async (e) => {
+  const file = e.target.files[0];
+  e.target.value = '';
+  if (!file) return;
+  try {
+    setBackground(await imageFileToDataUrl(file));
+  } catch (err) {
+    toast('Could not read that image');
+  }
+});
+$('#bgUrl').addEventListener('click', () => {
+  const url = prompt('Image URL for the background', bg.src.startsWith('data:') ? '' : bg.src);
+  if (url && url.trim()) setBackground(normalizeUrl(url.trim()));
+});
+$('#bgClear').addEventListener('click', () => setBackground(''));
+$('#bgBlur').addEventListener('input', (e) => {
+  bg.blur = Number(e.target.value);
+  applyBackground();
+});
+$('#bgBlur').addEventListener('change', saveBg);
 $('#prevPage').addEventListener('click', () => turnPage(-1));
 $('#nextPage').addEventListener('click', () => turnPage(1));
 $('#addBtn').addEventListener('click', () => {
@@ -864,6 +979,7 @@ $('#importFile').addEventListener('change', (e) => {
 
 /* Another tab saving the same app must not be overwritten by this tab's stale copy. */
 window.addEventListener('storage', (e) => {
+  if (e.key === BG_KEY) { bg = loadBg(); applyBackground(); return; }
   if (e.key !== STORE_KEY) return;
   state = load();
   applyTheme();
@@ -871,5 +987,6 @@ window.addEventListener('storage', (e) => {
 });
 
 applyTheme();
+applyBackground();
 save();
 render();

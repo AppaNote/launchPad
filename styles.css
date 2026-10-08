@@ -95,6 +95,7 @@
 
 *{box-sizing:border-box}
 html,body{height:100%}
+html{scrollbar-gutter:stable}
 body{
   margin:0;
   font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
@@ -118,6 +119,29 @@ body{
   mask-image:radial-gradient(70% 70% at 50% 40%, #000, transparent);
 }
 
+/* Custom background photo: panels stay frosted so the photo shows through as soft colour. */
+body.has-image .bg{
+  background:var(--bg-image) center/cover no-repeat;
+  filter:blur(var(--bg-blur,0px)) saturate(1.05);
+  transform:scale(1.06);
+}
+body.has-image .bg::after{
+  background-image:none; mask-image:none; -webkit-mask-image:none;
+  background:linear-gradient(180deg, rgba(0,0,0,.22), rgba(0,0,0,.42));
+}
+body.has-image .glass{
+  background:linear-gradient(180deg, rgba(14,18,30,.46), rgba(14,18,30,.32));
+  background:linear-gradient(180deg,
+    color-mix(in srgb, var(--page) 48%, transparent),
+    color-mix(in srgb, var(--page) 32%, transparent));
+}
+body.has-image .tile{background:linear-gradient(180deg, rgba(255,255,255,.10), rgba(255,255,255,.03))}
+body.has-image .tile:hover{background:linear-gradient(180deg, rgba(255,255,255,.20), rgba(255,255,255,.06))}
+body.has-image .card,body.has-image .arrow{
+  background:color-mix(in srgb, var(--page) 44%, transparent);
+  backdrop-filter:blur(22px) saturate(150%); -webkit-backdrop-filter:blur(22px) saturate(150%);
+}
+
 .glass{
   background:linear-gradient(180deg, var(--sheen-1), var(--sheen-2));
   border:1px solid var(--stroke);
@@ -126,27 +150,63 @@ body{
   box-shadow: var(--shadow), inset 0 1px 0 rgba(255,255,255,.28);
 }
 
-/* Top bar */
-.topbar{
-  position:sticky; top:12px; z-index:30; /* keeps the ··· menu above the quick links bar */
-  margin:12px auto 0; max-width:1360px;
-  display:flex; align-items:center; gap:16px;
-  padding:10px 14px; border-radius:var(--radius);
+/* Layout: sidebar + content */
+.shell{display:flex;min-height:100vh}
+.sidebar{
+  position:sticky; top:0; height:100vh; z-index:35;
+  width:224px; flex:0 0 224px; padding:24px 16px 18px;
+  display:flex; flex-direction:column; gap:26px;
+  border-radius:0; border-width:0 1px 0 0;
 }
-.brand{display:flex;align-items:center;gap:10px;min-width:150px}
-.brand h1{font-size:17px;margin:0;letter-spacing:.4px;font-weight:650}
+.content{flex:1;min-width:0;padding:24px 28px 60px}
+
+.brand{display:flex;align-items:center;gap:10px;padding:0 8px}
+.brand h1{font-size:22px;margin:0;letter-spacing:.3px;font-weight:700}
 .dot{width:12px;height:12px;border-radius:50%;
   background:linear-gradient(135deg,var(--accent),var(--accent2));
   box-shadow:0 0 16px var(--accent)}
 
-.tabs{display:flex;gap:6px;flex:1;justify-content:center}
+.tabs{display:flex;flex-direction:column;gap:6px}
 .tab{
+  display:flex;align-items:center;gap:12px;text-align:left;
   border:1px solid transparent;background:transparent;color:var(--muted);
-  padding:8px 16px;border-radius:12px;cursor:pointer;font-size:14px;font-weight:550;
-  transition:.2s;
+  padding:11px 14px;border-radius:12px;cursor:pointer;font-size:14.5px;font-weight:550;
+  font-family:inherit;transition:.2s;
 }
+.tab-ic{width:18px;height:18px;display:inline-grid}
+.tab-ic svg{width:100%;height:100%}
 .tab:hover{color:var(--text);background:rgba(255,255,255,.08)}
-.tab.active{color:var(--on-accent);background:linear-gradient(135deg,var(--accent),var(--accent2));border-color:transparent}
+.tab.active{color:var(--on-accent);background:linear-gradient(135deg,var(--accent),var(--accent2));border-color:transparent;
+  box-shadow:0 6px 18px var(--accent-soft)}
+
+.appearance{
+  margin-top:auto;padding:6px 4px 12px;border-radius:16px;
+  background:rgba(255,255,255,.06);border:1px solid var(--stroke);
+}
+.bg-actions{display:flex;gap:6px;padding:0 12px 6px}
+.btn.small{padding:6px 10px;font-size:12px;border-radius:10px}
+.bg-actions .btn:not(.ghost){flex:1}
+.slider{display:flex;align-items:center;gap:10px;padding:6px 12px 0;font-size:12px;color:var(--muted)}
+.slider input{flex:1;accent-color:var(--accent)}
+
+/* Header */
+.topbar{
+  position:relative; z-index:30; /* keeps the ··· menu above the quick links bar */
+  display:flex; align-items:center; justify-content:space-between; gap:16px;
+}
+.greeting h2{margin:0;font-size:28px;font-weight:700;letter-spacing:.2px;text-shadow:0 2px 14px rgba(0,0,0,.35)}
+.greeting p{margin:4px 0 0;color:var(--muted);font-size:14px;text-shadow:0 1px 8px rgba(0,0,0,.35)}
+
+/* Summary cards */
+.stats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:16px;margin-top:20px}
+.stat{display:flex;align-items:center;gap:14px;padding:16px 18px;border-radius:var(--radius);cursor:pointer;
+  text-align:left;color:var(--text);font-family:inherit;transition:transform .18s}
+.stat:hover{transform:translateY(-2px)}
+.stat .ic{width:46px;height:46px;flex:0 0 46px;border-radius:50%;display:grid;place-items:center;
+  color:var(--accent);background:var(--accent-soft);border:1px solid var(--stroke)}
+.stat .ic svg{width:22px;height:22px}
+.stat .k{display:block;font-size:13px;color:var(--muted)}
+.stat .v{display:block;font-size:22px;font-weight:700;margin-top:2px}
 
 .top-actions{display:flex;align-items:center;gap:8px}
 .search{
@@ -170,15 +230,15 @@ body{
 .menu button{background:transparent;border:0;color:var(--text);text-align:left;padding:9px 12px;border-radius:10px;cursor:pointer;font-size:13px}
 .menu button:hover{background:rgba(255,255,255,.12)}
 .menu-label{font-size:10.5px;letter-spacing:.7px;text-transform:uppercase;color:var(--muted);padding:8px 12px 4px;font-weight:600}
-.swatches{display:flex;gap:6px;padding:0 12px 10px;border-bottom:1px solid var(--stroke);margin-bottom:6px}
-.swatch{width:26px;height:26px;border-radius:50%;cursor:pointer;padding:0;
+.swatches{display:flex;gap:6px;padding:0 12px 8px}
+.swatch{width:24px;height:24px;border-radius:50%;cursor:pointer;padding:0;
   border:2px solid transparent;box-shadow:0 0 0 1px var(--stroke);transition:.18s}
 .swatch:hover{transform:scale(1.08)}
 .swatch.active{border-color:var(--text);box-shadow:0 0 0 1px var(--text)}
 
 /* Quick links */
 .quicklinks{
-  max-width:1360px;margin:12px auto 0;padding:8px 12px;border-radius:var(--radius);
+  margin:16px 0 0;padding:8px 12px;border-radius:var(--radius);
   display:flex;gap:6px;flex-wrap:wrap;align-items:center;
   position:relative;z-index:25; /* hover menus must sit above the launcher panels */
 }
@@ -215,7 +275,7 @@ button.qlink.add{border:1px dashed var(--stroke)}
 .qitem:hover .mini{opacity:.8}
 .qitem.add{color:var(--muted);border:1px dashed var(--stroke);margin-top:4px;justify-content:center}
 
-main{max-width:1360px;margin:0 auto;padding:18px 12px 60px}
+main{padding:18px 0 0}
 .view.hidden,.hidden{display:none !important}
 
 /* Launcher pager */
@@ -228,7 +288,7 @@ main{max-width:1360px;margin:0 auto;padding:18px 12px 60px}
 }
 .arrow:hover{background:rgba(255,255,255,.2);transform:scale(1.03)}
 .pages{flex:1;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}
-@media (max-width:900px){.pages{grid-template-columns:1fr}}
+@media (max-width:1100px){.pages{grid-template-columns:1fr}}
 
 .env{border-radius:var(--radius);padding:14px}
 .env-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
@@ -329,7 +389,7 @@ main{max-width:1360px;margin:0 auto;padding:18px 12px 60px}
 .res-card .tagrow{margin-bottom:0}
 .card-actions{position:absolute;top:12px;right:12px;display:flex;gap:4px;opacity:0;transition:.18s}
 .card:hover .card-actions{opacity:1}
-.empty{color:var(--muted);text-align:center;padding:60px 0;font-size:14px}
+.empty{grid-column:1/-1;color:var(--muted);text-align:center;padding:60px 0;font-size:14px}
 
 /* Modal */
 .overlay{position:fixed;inset:0;z-index:60;background:rgba(3,6,14,.6);backdrop-filter:blur(6px);
@@ -357,4 +417,15 @@ main{max-width:1360px;margin:0 auto;padding:18px 12px 60px}
   position:fixed;bottom:26px;left:50%;transform:translateX(-50%);
   padding:11px 20px;border-radius:14px;font-size:13px;z-index:80;
   background:rgba(12,18,32,.9);border:1px solid var(--stroke);backdrop-filter:blur(14px);
+}
+
+@media (max-width:900px){
+  .shell{flex-direction:column}
+  .sidebar{position:relative;height:auto;width:auto;flex:none;flex-direction:row;flex-wrap:wrap;
+    align-items:center;gap:14px;padding:14px 16px;border-width:0 0 1px}
+  .tabs{flex-direction:row}
+  .appearance{margin:0;width:100%}
+  .content{padding:18px 14px 50px}
+  .stats{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .topbar{flex-wrap:wrap}
 }

@@ -102,6 +102,7 @@
 
 *{box-sizing:border-box}
 html,body{height:100%}
+html{scrollbar-gutter:stable}
 body{
   margin:0;
   font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
@@ -125,6 +126,29 @@ body{
   mask-image:radial-gradient(70% 70% at 50% 40%, #000, transparent);
 }
 
+/* Custom background photo: panels stay frosted so the photo shows through as soft colour. */
+body.has-image .bg{
+  background:var(--bg-image) center/cover no-repeat;
+  filter:blur(var(--bg-blur,0px)) saturate(1.05);
+  transform:scale(1.06);
+}
+body.has-image .bg::after{
+  background-image:none; mask-image:none; -webkit-mask-image:none;
+  background:linear-gradient(180deg, rgba(0,0,0,.22), rgba(0,0,0,.42));
+}
+body.has-image .glass{
+  background:linear-gradient(180deg, rgba(14,18,30,.46), rgba(14,18,30,.32));
+  background:linear-gradient(180deg,
+    color-mix(in srgb, var(--page) 48%, transparent),
+    color-mix(in srgb, var(--page) 32%, transparent));
+}
+body.has-image .tile{background:linear-gradient(180deg, rgba(255,255,255,.10), rgba(255,255,255,.03))}
+body.has-image .tile:hover{background:linear-gradient(180deg, rgba(255,255,255,.20), rgba(255,255,255,.06))}
+body.has-image .card,body.has-image .arrow{
+  background:color-mix(in srgb, var(--page) 44%, transparent);
+  backdrop-filter:blur(22px) saturate(150%); -webkit-backdrop-filter:blur(22px) saturate(150%);
+}
+
 .glass{
   background:linear-gradient(180deg, var(--sheen-1), var(--sheen-2));
   border:1px solid var(--stroke);
@@ -133,27 +157,63 @@ body{
   box-shadow: var(--shadow), inset 0 1px 0 rgba(255,255,255,.28);
 }
 
-/* Top bar */
-.topbar{
-  position:sticky; top:12px; z-index:30; /* keeps the ··· menu above the quick links bar */
-  margin:12px auto 0; max-width:1360px;
-  display:flex; align-items:center; gap:16px;
-  padding:10px 14px; border-radius:var(--radius);
+/* Layout: sidebar + content */
+.shell{display:flex;min-height:100vh}
+.sidebar{
+  position:sticky; top:0; height:100vh; z-index:35;
+  width:224px; flex:0 0 224px; padding:24px 16px 18px;
+  display:flex; flex-direction:column; gap:26px;
+  border-radius:0; border-width:0 1px 0 0;
 }
-.brand{display:flex;align-items:center;gap:10px;min-width:150px}
-.brand h1{font-size:17px;margin:0;letter-spacing:.4px;font-weight:650}
+.content{flex:1;min-width:0;padding:24px 28px 60px}
+
+.brand{display:flex;align-items:center;gap:10px;padding:0 8px}
+.brand h1{font-size:22px;margin:0;letter-spacing:.3px;font-weight:700}
 .dot{width:12px;height:12px;border-radius:50%;
   background:linear-gradient(135deg,var(--accent),var(--accent2));
   box-shadow:0 0 16px var(--accent)}
 
-.tabs{display:flex;gap:6px;flex:1;justify-content:center}
+.tabs{display:flex;flex-direction:column;gap:6px}
 .tab{
+  display:flex;align-items:center;gap:12px;text-align:left;
   border:1px solid transparent;background:transparent;color:var(--muted);
-  padding:8px 16px;border-radius:12px;cursor:pointer;font-size:14px;font-weight:550;
-  transition:.2s;
+  padding:11px 14px;border-radius:12px;cursor:pointer;font-size:14.5px;font-weight:550;
+  font-family:inherit;transition:.2s;
 }
+.tab-ic{width:18px;height:18px;display:inline-grid}
+.tab-ic svg{width:100%;height:100%}
 .tab:hover{color:var(--text);background:rgba(255,255,255,.08)}
-.tab.active{color:var(--on-accent);background:linear-gradient(135deg,var(--accent),var(--accent2));border-color:transparent}
+.tab.active{color:var(--on-accent);background:linear-gradient(135deg,var(--accent),var(--accent2));border-color:transparent;
+  box-shadow:0 6px 18px var(--accent-soft)}
+
+.appearance{
+  margin-top:auto;padding:6px 4px 12px;border-radius:16px;
+  background:rgba(255,255,255,.06);border:1px solid var(--stroke);
+}
+.bg-actions{display:flex;gap:6px;padding:0 12px 6px}
+.btn.small{padding:6px 10px;font-size:12px;border-radius:10px}
+.bg-actions .btn:not(.ghost){flex:1}
+.slider{display:flex;align-items:center;gap:10px;padding:6px 12px 0;font-size:12px;color:var(--muted)}
+.slider input{flex:1;accent-color:var(--accent)}
+
+/* Header */
+.topbar{
+  position:relative; z-index:30; /* keeps the ··· menu above the quick links bar */
+  display:flex; align-items:center; justify-content:space-between; gap:16px;
+}
+.greeting h2{margin:0;font-size:28px;font-weight:700;letter-spacing:.2px;text-shadow:0 2px 14px rgba(0,0,0,.35)}
+.greeting p{margin:4px 0 0;color:var(--muted);font-size:14px;text-shadow:0 1px 8px rgba(0,0,0,.35)}
+
+/* Summary cards */
+.stats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:16px;margin-top:20px}
+.stat{display:flex;align-items:center;gap:14px;padding:16px 18px;border-radius:var(--radius);cursor:pointer;
+  text-align:left;color:var(--text);font-family:inherit;transition:transform .18s}
+.stat:hover{transform:translateY(-2px)}
+.stat .ic{width:46px;height:46px;flex:0 0 46px;border-radius:50%;display:grid;place-items:center;
+  color:var(--accent);background:var(--accent-soft);border:1px solid var(--stroke)}
+.stat .ic svg{width:22px;height:22px}
+.stat .k{display:block;font-size:13px;color:var(--muted)}
+.stat .v{display:block;font-size:22px;font-weight:700;margin-top:2px}
 
 .top-actions{display:flex;align-items:center;gap:8px}
 .search{
@@ -177,15 +237,15 @@ body{
 .menu button{background:transparent;border:0;color:var(--text);text-align:left;padding:9px 12px;border-radius:10px;cursor:pointer;font-size:13px}
 .menu button:hover{background:rgba(255,255,255,.12)}
 .menu-label{font-size:10.5px;letter-spacing:.7px;text-transform:uppercase;color:var(--muted);padding:8px 12px 4px;font-weight:600}
-.swatches{display:flex;gap:6px;padding:0 12px 10px;border-bottom:1px solid var(--stroke);margin-bottom:6px}
-.swatch{width:26px;height:26px;border-radius:50%;cursor:pointer;padding:0;
+.swatches{display:flex;gap:6px;padding:0 12px 8px}
+.swatch{width:24px;height:24px;border-radius:50%;cursor:pointer;padding:0;
   border:2px solid transparent;box-shadow:0 0 0 1px var(--stroke);transition:.18s}
 .swatch:hover{transform:scale(1.08)}
 .swatch.active{border-color:var(--text);box-shadow:0 0 0 1px var(--text)}
 
 /* Quick links */
 .quicklinks{
-  max-width:1360px;margin:12px auto 0;padding:8px 12px;border-radius:var(--radius);
+  margin:16px 0 0;padding:8px 12px;border-radius:var(--radius);
   display:flex;gap:6px;flex-wrap:wrap;align-items:center;
   position:relative;z-index:25; /* hover menus must sit above the launcher panels */
 }
@@ -222,7 +282,7 @@ button.qlink.add{border:1px dashed var(--stroke)}
 .qitem:hover .mini{opacity:.8}
 .qitem.add{color:var(--muted);border:1px dashed var(--stroke);margin-top:4px;justify-content:center}
 
-main{max-width:1360px;margin:0 auto;padding:18px 12px 60px}
+main{padding:18px 0 0}
 .view.hidden,.hidden{display:none !important}
 
 /* Launcher pager */
@@ -235,7 +295,7 @@ main{max-width:1360px;margin:0 auto;padding:18px 12px 60px}
 }
 .arrow:hover{background:rgba(255,255,255,.2);transform:scale(1.03)}
 .pages{flex:1;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}
-@media (max-width:900px){.pages{grid-template-columns:1fr}}
+@media (max-width:1100px){.pages{grid-template-columns:1fr}}
 
 .env{border-radius:var(--radius);padding:14px}
 .env-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
@@ -336,7 +396,7 @@ main{max-width:1360px;margin:0 auto;padding:18px 12px 60px}
 .res-card .tagrow{margin-bottom:0}
 .card-actions{position:absolute;top:12px;right:12px;display:flex;gap:4px;opacity:0;transition:.18s}
 .card:hover .card-actions{opacity:1}
-.empty{color:var(--muted);text-align:center;padding:60px 0;font-size:14px}
+.empty{grid-column:1/-1;color:var(--muted);text-align:center;padding:60px 0;font-size:14px}
 
 /* Modal */
 .overlay{position:fixed;inset:0;z-index:60;background:rgba(3,6,14,.6);backdrop-filter:blur(6px);
@@ -366,22 +426,57 @@ main{max-width:1360px;margin:0 auto;padding:18px 12px 60px}
   background:rgba(12,18,32,.9);border:1px solid var(--stroke);backdrop-filter:blur(14px);
 }
 
+@media (max-width:900px){
+  .shell{flex-direction:column}
+  .sidebar{position:relative;height:auto;width:auto;flex:none;flex-direction:row;flex-wrap:wrap;
+    align-items:center;gap:14px;padding:14px 16px;border-width:0 0 1px}
+  .tabs{flex-direction:row}
+  .appearance{margin:0;width:100%}
+  .content{padding:18px 14px 50px}
+  .stats{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .topbar{flex-wrap:wrap}
+}
+
 </style>
 </head>
 <body>
-<div class="bg"></div>
+<div class="bg" id="bg"></div>
 
-<header class="topbar glass">
+<div class="shell">
+<aside class="sidebar glass">
   <div class="brand">
     <span class="dot"></span>
     <h1>LaunchPad</h1>
   </div>
 
   <nav class="tabs" id="tabs">
-    <button class="tab active" data-view="launcher">Launcher</button>
-    <button class="tab" data-view="databases">Databases</button>
-    <button class="tab" data-view="resources">Resources</button>
+    <button class="tab active" data-view="launcher" data-icon="grid">Launcher</button>
+    <button class="tab" data-view="databases" data-icon="database">Databases</button>
+    <button class="tab" data-view="resources" data-icon="book">Resources</button>
   </nav>
+
+  <div class="appearance">
+    <div class="menu-label">Theme</div>
+    <div class="swatches" id="themePicker"></div>
+    <div class="menu-label">Background</div>
+    <div class="bg-actions">
+      <button class="btn small" id="bgUpload" type="button">Upload</button>
+      <button class="btn small" id="bgUrl" type="button">URL</button>
+      <button class="btn small ghost" id="bgClear" type="button" title="Remove background image">&times;</button>
+    </div>
+    <label class="slider">
+      <span>Blur</span>
+      <input type="range" id="bgBlur" min="0" max="24" step="1" />
+    </label>
+  </div>
+</aside>
+
+<div class="content">
+<header class="topbar">
+  <div class="greeting">
+    <h2 id="greeting">Welcome back</h2>
+    <p id="subGreeting">Here's your workspace.</p>
+  </div>
 
   <div class="top-actions">
     <input id="search" class="search" type="search" placeholder="Search…" autocomplete="off" />
@@ -389,8 +484,6 @@ main{max-width:1360px;margin:0 auto;padding:18px 12px 60px}
     <div class="menu-wrap">
       <button id="moreBtn" class="btn ghost" title="More">···</button>
       <div id="moreMenu" class="menu glass hidden">
-        <div class="menu-label">Theme</div>
-        <div class="swatches" id="themePicker"></div>
         <button data-action="export">Export backup (.json)</button>
         <button data-action="import">Import backup…</button>
         <button data-action="reset">Reset to defaults</button>
@@ -398,6 +491,8 @@ main{max-width:1360px;margin:0 auto;padding:18px 12px 60px}
     </div>
   </div>
 </header>
+
+<div class="stats" id="stats"></div>
 
 <div class="quicklinks glass" id="quickLinks"></div>
 
@@ -424,6 +519,8 @@ main{max-width:1360px;margin:0 auto;padding:18px 12px 60px}
     <div class="cards" id="resList"></div>
   </section>
 </main>
+</div>
+</div>
 
 <!-- Modal -->
 <div class="overlay hidden" id="overlay">
@@ -442,12 +539,16 @@ main{max-width:1360px;margin:0 auto;padding:18px 12px 60px}
 
 <div id="toast" class="toast hidden"></div>
 <input type="file" id="importFile" accept="application/json" class="hidden" />
+<input type="file" id="bgFile" accept="image/*" class="hidden" />
 
 <script>
 /* LaunchPad — local-first launcher, database registry and resource library.
    All data lives in localStorage and is never removed unless the user deletes it. */
 
 const STORE_KEY = 'launchpad.v1';
+/* Background photo is kept under its own key so a large image can never block saving the main data. */
+const BG_KEY = 'launchpad.bg';
+const BG_MAX_SIDE = 1920;
 const ENVS_PER_PAGE = 2;
 
 /* Themes are pure CSS variable sets; the swatch colours mirror --accent/--accent2. */
@@ -543,6 +644,7 @@ let view = 'launcher';
 let dbFilter = 'All';
 let resFilter = 'All';
 let query = '';
+let bg = loadBg();
 
 function load() {
   try {
@@ -720,12 +822,93 @@ function renderThemePicker() {
   });
 }
 
+/* ---------- background ---------- */
+function loadBg() {
+  try {
+    const data = JSON.parse(localStorage.getItem(BG_KEY) || '{}');
+    return { src: data.src || '', blur: Number(data.blur) || 0 };
+  } catch (e) {
+    return { src: '', blur: 0 };
+  }
+}
+function saveBg() {
+  try {
+    localStorage.setItem(BG_KEY, JSON.stringify(bg));
+    return true;
+  } catch (e) {
+    toast('Image is too large to save — try a smaller one');
+    return false;
+  }
+}
+function applyBackground() {
+  document.body.classList.toggle('has-image', !!bg.src);
+  const node = $('#bg');
+  node.style.setProperty('--bg-image', bg.src ? `url("${bg.src.replace(/"/g, '%22')}")` : 'none');
+  node.style.setProperty('--bg-blur', bg.blur + 'px');
+  $('#bgBlur').value = bg.blur;
+}
+function setBackground(src) {
+  const prev = bg.src;
+  bg.src = src;
+  if (!saveBg()) bg.src = prev;
+  applyBackground();
+}
+/* Uploaded photos are downscaled to JPEG so they fit comfortably in localStorage. */
+function imageFileToDataUrl(file) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onerror = reject;
+    reader.onload = () => {
+      const img = new Image();
+      img.onerror = reject;
+      img.onload = () => {
+        const scale = Math.min(1, BG_MAX_SIDE / Math.max(img.width, img.height));
+        const canvas = document.createElement('canvas');
+        canvas.width = Math.round(img.width * scale);
+        canvas.height = Math.round(img.height * scale);
+        canvas.getContext('2d').drawImage(img, 0, 0, canvas.width, canvas.height);
+        resolve(canvas.toDataURL('image/jpeg', 0.82));
+      };
+      img.src = reader.result;
+    };
+    reader.readAsDataURL(file);
+  });
+}
+
 /* ---------- rendering ---------- */
 function render() {
+  renderGreeting();
+  renderStats();
   renderQuickLinks();
   if (view === 'launcher') renderLauncher();
   if (view === 'databases') renderDatabases();
   if (view === 'resources') renderResources();
+}
+
+function renderGreeting() {
+  const h = new Date().getHours();
+  $('#greeting').textContent = h < 12 ? 'Good morning' : h < 18 ? 'Good afternoon' : 'Good evening';
+  $('#subGreeting').textContent = new Date().toLocaleDateString(undefined,
+    { weekday: 'long', month: 'long', day: 'numeric' }) + ' · here’s your workspace.';
+}
+
+function renderStats() {
+  const wrap = $('#stats');
+  wrap.innerHTML = '';
+  const tiles = state.environments.reduce((n, e) => n + e.tiles.length, 0);
+  [
+    ['Environments', state.environments.length, 'cloud', 'launcher'],
+    ['Launch tiles', tiles, 'grid', 'launcher'],
+    ['Databases', state.databases.length, 'database', 'databases'],
+    ['Resources', state.resources.length, 'book', 'resources']
+  ].forEach(([label, value, icon, target]) => {
+    const b = el('button', 'stat glass');
+    b.type = 'button';
+    b.innerHTML = `<span class="ic">${iconHtml(icon)}</span>
+      <span><span class="k">${esc(label)}</span><span class="v">${value}</span></span>`;
+    b.addEventListener('click', () => setView(target));
+    wrap.appendChild(b);
+  });
 }
 
 function renderQuickLinks() {
@@ -1226,7 +1409,7 @@ function saveModal() {
 
 /* ---------- backup ---------- */
 function exportData() {
-  const blob = new Blob([JSON.stringify(state, null, 2)], { type: 'application/json' });
+  const blob = new Blob([JSON.stringify({ ...state, background: bg }, null, 2)], { type: 'application/json' });
   const a = el('a');
   a.href = URL.createObjectURL(blob);
   a.download = `launchpad-backup-${new Date().toISOString().slice(0, 10)}.json`;
@@ -1246,6 +1429,11 @@ function importData(file) {
         theme: THEMES.some((t) => t.id === data.theme) ? data.theme : state.theme
       };
       page = 0;
+      if (data.background && typeof data.background.src === 'string') {
+        bg = { src: data.background.src, blur: Number(data.background.blur) || 0 };
+        saveBg();
+        applyBackground();
+      }
       applyTheme();
       save(); render(); toast('Backup imported');
     } catch (e) {
@@ -1256,14 +1444,39 @@ function importData(file) {
 }
 
 /* ---------- wiring ---------- */
-$('#tabs').addEventListener('click', (e) => {
-  const b = e.target.closest('.tab');
-  if (!b) return;
-  view = b.dataset.view;
-  document.querySelectorAll('.tab').forEach((t) => t.classList.toggle('active', t === b));
+function setView(next) {
+  view = next;
+  document.querySelectorAll('.tab').forEach((t) => t.classList.toggle('active', t.dataset.view === view));
   document.querySelectorAll('.view').forEach((v) => v.classList.toggle('hidden', v.id !== 'view-' + view));
   render();
+}
+document.querySelectorAll('.tab').forEach((b) =>
+  b.insertAdjacentHTML('afterbegin', `<span class="tab-ic">${iconHtml(b.dataset.icon)}</span>`));
+$('#tabs').addEventListener('click', (e) => {
+  const b = e.target.closest('.tab');
+  if (b) setView(b.dataset.view);
 });
+$('#bgUpload').addEventListener('click', () => $('#bgFile').click());
+$('#bgFile').addEventListener('change', async (e) => {
+  const file = e.target.files[0];
+  e.target.value = '';
+  if (!file) return;
+  try {
+    setBackground(await imageFileToDataUrl(file));
+  } catch (err) {
+    toast('Could not read that image');
+  }
+});
+$('#bgUrl').addEventListener('click', () => {
+  const url = prompt('Image URL for the background', bg.src.startsWith('data:') ? '' : bg.src);
+  if (url && url.trim()) setBackground(normalizeUrl(url.trim()));
+});
+$('#bgClear').addEventListener('click', () => setBackground(''));
+$('#bgBlur').addEventListener('input', (e) => {
+  bg.blur = Number(e.target.value);
+  applyBackground();
+});
+$('#bgBlur').addEventListener('change', saveBg);
 $('#prevPage').addEventListener('click', () => turnPage(-1));
 $('#nextPage').addEventListener('click', () => turnPage(1));
 $('#addBtn').addEventListener('click', () => {
@@ -1310,6 +1523,7 @@ $('#importFile').addEventListener('change', (e) => {
 
 /* Another tab saving the same app must not be overwritten by this tab's stale copy. */
 window.addEventListener('storage', (e) => {
+  if (e.key === BG_KEY) { bg = loadBg(); applyBackground(); return; }
   if (e.key !== STORE_KEY) return;
   state = load();
   applyTheme();
@@ -1317,6 +1531,7 @@ window.addEventListener('storage', (e) => {
 });
 
 applyTheme();
+applyBackground();
 save();
 render();
 
