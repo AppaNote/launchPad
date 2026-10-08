@@ -1191,12 +1191,12 @@ function removeItem(collection, id, label) {
 function removeTile(env, tile) {
   if (!confirm(`Delete tile "${tile.label}" from ${env.name}?`)) return;
   env.tiles = env.tiles.filter((t) => t.id !== tile.id);
-  save(); renderLauncher(); toast('Deleted');
+  save(); render(); toast('Deleted');
 }
 function removeEnvironment(env) {
   if (!confirm(`Delete environment "${env.name}" and its ${env.tiles.length} tiles?`)) return;
   state.environments = state.environments.filter((e) => e.id !== env.id);
-  save(); renderLauncher(); toast('Deleted');
+  save(); render(); toast('Deleted');
 }
 
 /* ---------- modal ---------- */
@@ -1356,9 +1356,26 @@ function closeModal() {
   modalCtx = null;
 }
 
+/* Looks an item up in the current state, which another tab may have reloaded since the modal opened. */
+function currentItem(kind, id) {
+  if (kind === 'tile') {
+    for (const env of state.environments) {
+      const t = env.tiles.find((x) => x.id === id);
+      if (t) return t;
+    }
+    return null;
+  }
+  if (kind === 'quickLink') return findQuickGroup(id);
+  if (kind === 'quickSubLink') return findQuickItem(id)?.item || null;
+  if (kind === 'environment') return state.environments.find((e) => e.id === id) || null;
+  const key = { database: 'databases', resource: 'resources' }[kind];
+  return state[key].find((x) => x.id === id) || null;
+}
+
 function saveModal() {
   if (!modalCtx || modalCtx.kind === 'chooser') return closeModal();
-  const { kind, item } = modalCtx;
+  const { kind } = modalCtx;
+  const item = modalCtx.item ? currentItem(kind, modalCtx.item.id) : null;
   const schema = SCHEMAS[kind];
   const values = {};
   $('#modalForm').querySelectorAll('[data-key]').forEach((i) => { values[i.dataset.key] = i.value.trim(); });
