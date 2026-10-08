@@ -647,7 +647,7 @@ function openModal(kind, item = null, extra = {}) {
     const wrap = el('div', 'field');
     wrap.appendChild(el('label', null, esc(f.label) + (f.required ? ' *' : '')));
     let input;
-    const value = item ? (item[f.k] ?? '') : (extra[f.k] ?? '');
+    const value = item?.[f.k] ?? extra[f.k] ?? '';
 
     if (f.type === 'select') {
       input = el('select');
@@ -860,6 +860,14 @@ $('#moreMenu').addEventListener('click', (e) => {
 $('#importFile').addEventListener('change', (e) => {
   if (e.target.files[0]) importData(e.target.files[0]);
   e.target.value = '';
+});
+
+/* Another tab saving the same app must not be overwritten by this tab's stale copy. */
+window.addEventListener('storage', (e) => {
+  if (e.key !== STORE_KEY) return;
+  state = load();
+  applyTheme();
+  render();
 });
 
 applyTheme();
