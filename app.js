@@ -9,13 +9,14 @@ const ENVS_PER_PAGE = 2;
 
 /* Themes are pure CSS variable sets; the swatch colours mirror --accent/--accent2. */
 const THEMES = [
+  { id: 'sunny',   name: 'Sunny',   colors: ['#ffd84d', '#f5a623'] },
   { id: 'aurora',  name: 'Aurora',  colors: ['#7fd3ff', '#b79bff'] },
   { id: 'gold',    name: 'Gold',    colors: ['#f2c14e', '#d9a01f'] },
   { id: 'emerald', name: 'Emerald', colors: ['#57e8ae', '#29b6c9'] },
   { id: 'rose',    name: 'Rose',    colors: ['#ff9ec0', '#c07bff'] },
   { id: 'slate',   name: 'Slate',   colors: ['#9fb4cc', '#6d86a3'] }
 ];
-const DEFAULT_THEME = 'aurora';
+const DEFAULT_THEME = 'sunny';
 
 const uid = () => Math.random().toString(36).slice(2, 10) + Date.now().toString(36);
 
@@ -44,6 +45,20 @@ const ICONS = {
   link:     SVG('<path d="M10 14a4 4 0 005.7 0l3-3a4 4 0 10-5.7-5.7L11.5 7"/><path d="M14 10a4 4 0 00-5.7 0l-3 3A4 4 0 109 18.7l1.5-1.5"/>')
 };
 const ICON_NAMES = Object.keys(ICONS);
+/* App-icon gradient per glyph, iPad style. */
+const ICON_COLORS = {
+  globe: ['#4facfe', '#1f7ae0'], grid: ['#a18cd1', '#6f4fe8'], money: ['#43e97b', '#16a35a'],
+  tools: ['#f7971e', '#e0600f'], chart: ['#5ee7df', '#2484d0'], docs: ['#ff9a9e', '#e0507f'],
+  clock: ['#ffb347', '#f2763b'], org: ['#7fd6ff', '#3b74e8'], robot: ['#c471f5', '#7a3fe0'],
+  database: ['#7b93c7', '#3a4c86'], health: ['#ff6a88', '#d9284a'], folder: ['#ffd24a', '#e39a07'],
+  book: ['#ff9966', '#e0502b'], gear: ['#9aa8b5', '#5b6873'], lock: ['#5b7fd1', '#2a3f86'],
+  mail: ['#36d1dc', '#1b82d6'], cloud: ['#74ebd5', '#2fa8c0'], video: ['#f857a6', '#c92a68'],
+  search: ['#38ef7d', '#0f9488'], link: ['#b993d6', '#7d8fd8']
+};
+const iconStyle = (name) => {
+  const [c1, c2] = ICON_COLORS[name] || ICON_COLORS.globe;
+  return `--c1:${c1};--c2:${c2}`;
+};
 const UI = {
   edit:  SVG('<path d="M4 20h4L20 8a2.8 2.8 0 10-4-4L4 16v4z"/><path d="M14 6l4 4"/>'),
   trash: SVG('<path d="M4 7h16M10 7V4h4v3M6 7l1 13h10l1-13"/>'),
@@ -486,7 +501,7 @@ function envPanel(env) {
         <span class="icon-btn" data-a="edit" title="Edit">${UI.edit}</span>
         <span class="icon-btn" data-a="del" title="Delete">${UI.trash}</span>
       </div>
-      <div class="glyph">${iconHtml(t.icon)}</div>
+      <div class="glyph" style="${iconStyle(t.icon)}">${iconHtml(t.icon)}</div>
       <div class="label">${esc(t.label)}</div>
       ${t.sub ? `<div class="sub">${esc(t.sub)}</div>` : ''}`;
     tile.addEventListener('click', (e) => {
