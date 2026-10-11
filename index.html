@@ -11,18 +11,14 @@
 
 <div class="shell">
 <aside class="sidebar glass">
-  <div class="brand">
-    <span class="dot"></span>
-    <h1>LaunchPad</h1>
-  </div>
-
   <nav class="tabs" id="tabs">
-    <button class="tab active" data-view="launcher" data-icon="grid">Launcher</button>
-    <button class="tab" data-view="databases" data-icon="database">Databases</button>
-    <button class="tab" data-view="resources" data-icon="book">Resources</button>
+    <button class="tab active" data-view="launcher" data-icon="grid" title="Launcher" aria-label="Launcher">Launcher</button>
+    <button class="tab" data-view="databases" data-icon="database" title="Databases" aria-label="Databases">Databases</button>
+    <button class="tab" data-view="resources" data-icon="book" title="Resources" aria-label="Resources">Resources</button>
   </nav>
+  <button class="tab" id="settingsBtn" type="button" title="Appearance" aria-label="Appearance"></button>
 
-  <div class="appearance">
+  <div class="appearance glass" id="appearance">
     <div class="menu-label">Theme</div>
     <div class="swatches" id="themePicker"></div>
     <div class="menu-label">Background</div>
@@ -41,6 +37,7 @@
 <div class="content">
 <header class="topbar">
   <div class="greeting">
+    <div class="brand"><span class="dot"></span><h1>LaunchPad</h1></div>
     <h2 id="greeting">Welcome back</h2>
     <p id="subGreeting">Here's your workspace.</p>
   </div>

@@ -23,6 +23,7 @@ Everything is stored in your browser's `localStorage` under the key `launchpad.v
 - **Quick links bar** — the top row is a set of groups (SharePoint, Azure DevOps, Intranet, …). Hovering a group drops down its links, so one SharePoint entry can hold every site you use; click a group with no children to open its own URL. Groups and their links each have edit/delete, and `+ Add link` inside a menu adds to that group.
 - **Themes** — the **Theme** swatches at the bottom of the sidebar switch between six palettes (Sunny — the default warm yellow — Aurora, Gold, Emerald, Rose, Slate). The choice is saved with your data and carried along by export/import.
 - **Launcher tiles** are round, colourful app icons (iPad style) sized so a full environment page fits on screen without scrolling.
+- **Navigation** is a floating pill of round icon buttons on the left (Launcher, Databases, Resources); the gear button at its bottom opens Theme and Background settings.
 - **Background photo** — under **Background** in the sidebar, **Upload** a picture from your PC or paste an image **URL**; panels turn to frosted glass over it, the **Blur** slider softens the photo, and **×** goes back to the plain theme background. Uploads are downscaled (max 1920 px JPEG) and stored in localStorage under `launchpad.bg`, separately from your data; export/import includes it.
 - Global **+ Add** button, search across the active tab, JSON export/import, reset to defaults.
 

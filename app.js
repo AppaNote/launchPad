@@ -6,6 +6,7 @@ const STORE_KEY = 'launchpad.v1';
 const BG_KEY = 'launchpad.bg';
 const BG_MAX_SIDE = 1920;
 const ENVS_PER_PAGE = 2;
+const LAYOUT_VERSION = 2;
 
 /* Themes are pure CSS variable sets; the swatch colours mirror --accent/--accent2. */
 const THEMES = [
@@ -82,7 +83,9 @@ function defaults() {
     { id: uid(), label: 'FINEOS',       sub: '',      icon: 'health',   url: '' }
   ];
   return {
+    layoutVersion: LAYOUT_VERSION,
     quickLinks: [
+      { id: uid(), name: 'Intranet', url: '', items: [] },
       { id: uid(), name: 'SharePoint', url: '', items: [
         { id: uid(), name: 'Team site', url: '' },
         { id: uid(), name: 'Finance', url: '' }
@@ -92,7 +95,6 @@ function defaults() {
         { id: uid(), name: 'Repos', url: '' },
         { id: uid(), name: 'Pipelines', url: '' }
       ] },
-      { id: uid(), name: 'Intranet', url: '', items: [] },
       { id: uid(), name: 'Email', url: '', items: [] },
       { id: uid(), name: 'IT Wiki', url: '', items: [] },
       { id: uid(), name: 'Power Automate', url: '', items: [] }
@@ -117,13 +119,22 @@ let resFilter = 'All';
 let query = '';
 let bg = loadBg();
 
+/* v2 moved the Intranet quick link to the front of the bar. */
+function intranetFirst(groups) {
+  const i = groups.findIndex((g) => g.name.trim().toLowerCase() === 'intranet');
+  if (i > 0) groups.unshift(groups.splice(i, 1)[0]);
+}
+
 function load() {
   try {
     const raw = localStorage.getItem(STORE_KEY);
     if (!raw) return defaults();
     const data = JSON.parse(raw);
+    const quickLinks = (data.quickLinks || []).map(normalizeQuickLink);
+    if ((data.layoutVersion || 1) < 2) intranetFirst(quickLinks);
     return {
-      quickLinks: (data.quickLinks || []).map(normalizeQuickLink),
+      layoutVersion: LAYOUT_VERSION,
+      quickLinks,
       environments: data.environments || [],
       databases: data.databases || [],
       resources: data.resources || [],
@@ -910,6 +921,7 @@ function importData(file) {
     try {
       const data = JSON.parse(reader.result);
       state = {
+        layoutVersion: LAYOUT_VERSION,
         quickLinks: (data.quickLinks || []).map(normalizeQuickLink),
         environments: data.environments || [],
         databases: data.databases || [],
@@ -938,8 +950,21 @@ function setView(next) {
   document.querySelectorAll('.view').forEach((v) => v.classList.toggle('hidden', v.id !== 'view-' + view));
   render();
 }
-document.querySelectorAll('.tab').forEach((b) =>
-  b.insertAdjacentHTML('afterbegin', `<span class="tab-ic">${iconHtml(b.dataset.icon)}</span>`));
+document.querySelectorAll('.tab').forEach((b) => {
+  b.innerHTML = `<span class="tab-ic">${iconHtml(b.dataset.icon)}</span><span class="tab-label">${esc(b.textContent)}</span>`;
+});
+$('#settingsBtn').innerHTML = iconHtml('gear');
+$('#settingsBtn').addEventListener('click', (e) => {
+  e.stopPropagation();
+  const open = $('#appearance').classList.toggle('open');
+  $('#settingsBtn').classList.toggle('active', open);
+});
+document.addEventListener('click', (e) => {
+  if (!e.target.closest('#appearance, #settingsBtn')) {
+    $('#appearance').classList.remove('open');
+    $('#settingsBtn').classList.remove('active');
+  }
+});
 $('#tabs').addEventListener('click', (e) => {
   const b = e.target.closest('.tab');
   if (b) setView(b.dataset.view);
