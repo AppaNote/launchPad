@@ -122,6 +122,8 @@
   <div class="md-bar glass">
     <button class="btn small ghost" id="mdBack" type="button" title="Back to notes (Esc)">&larr; Notes</button>
     <div class="md-title"><span id="mdName"></span><span id="mdDirty" class="md-dirty hidden" title="Unsaved changes">&#9679;</span></div>
+    <button class="btn small ghost" id="mdOutlineBtn" type="button" title="Show / hide outline (table of contents)">&#9776; Outline</button>
+    <select class="md-heading" id="mdHeading" title="Subject, paragraph or heading level H1–H7"></select>
     <div class="md-tools" id="mdTools"></div>
     <div class="seg" id="mdModes">
       <button type="button" data-mode="edit">Edit</button>
@@ -138,10 +140,16 @@
       </div>
     </div>
   </div>
+  <div class="md-main">
+  <aside class="md-outline glass" id="mdOutline">
+    <div class="md-outline-title">Outline</div>
+    <div class="md-outline-list" id="mdOutlineList"></div>
+  </aside>
   <div class="md-body glass" id="mdBody">
     <textarea id="mdInput" spellcheck="true" placeholder="# Title&#10;&#10;Write **Markdown** here…"></textarea>
     <div class="md-divider" id="mdDivider" title="Drag to resize · double-click to reset"></div>
     <div class="md-preview md" id="mdPreview"></div>
+  </div>
   </div>
 </div>
 <div id="printArea"></div>

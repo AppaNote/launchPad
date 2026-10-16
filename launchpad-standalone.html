@@ -529,7 +529,8 @@ body.editing{overflow:hidden}
 .seg{display:flex;padding:2px;border-radius:10px;border:1px solid var(--stroke);background:rgba(255,255,255,.18)}
 .seg button.active{background:linear-gradient(135deg,var(--accent),var(--accent2));color:var(--on-accent)}
 .md-bar .menu{top:38px}
-.md-body{flex:1;min-height:0;border-radius:18px;display:grid;grid-template-columns:var(--split) 10px 1fr;overflow:hidden}
+.md-main{flex:1;min-height:0;display:flex;gap:10px}
+.md-body{flex:1;min-width:0;min-height:0;border-radius:18px;display:grid;grid-template-columns:var(--split) 10px 1fr;overflow:hidden}
 #mdInput{resize:none;border:0;outline:none;padding:22px 24px;background:rgba(255,255,255,.35);color:var(--text);
   font:14px/1.6 ui-monospace,SFMono-Regular,Consolas,monospace;tab-size:2}
 .md-divider{cursor:col-resize;background:rgba(127,127,127,.12);position:relative;touch-action:none}
@@ -540,9 +541,39 @@ body.editing{overflow:hidden}
 .md-editor[data-mode="edit"] .md-body{grid-template-columns:1fr}
 .md-editor[data-mode="edit"] .md-divider,.md-editor[data-mode="edit"] .md-preview{display:none}
 .md-editor[data-mode="read"] .md-body{grid-template-columns:1fr}
-.md-editor[data-mode="read"] #mdInput,.md-editor[data-mode="read"] .md-divider,.md-editor[data-mode="read"] .md-tools{display:none}
+.md-editor[data-mode="read"] #mdInput,.md-editor[data-mode="read"] .md-divider,.md-editor[data-mode="read"] .md-tools,.md-editor[data-mode="read"] .md-heading{display:none}
 .md-editor[data-mode="read"] .md-preview{padding:34px max(30px, calc(50% - 420px))}
 @media (max-width:900px){ .md-tools{display:none} }
+
+/* Typora-style extras: subject, H7, TOC, outline, code blocks */
+.md .md-subject{font-size:2.3em;font-weight:800;line-height:1.15;letter-spacing:-.01em;margin:0 0 .25em}
+.md .md-meta{color:#777;font-size:.9em;margin:-.1em 0 1.2em}
+.md .h7{font-size:.85em;font-weight:700;margin:1em 0 .4em;opacity:.75;text-transform:uppercase;letter-spacing:.04em}
+.md .md-toc{display:flex;flex-direction:column;gap:2px;margin:0 0 1.2em;padding:10px 14px;border-radius:10px;
+  background:rgba(127,127,127,.1);border-left:3px solid var(--accent)}
+.md .md-toc a{text-decoration:none}
+.md .md-toc a:hover{text-decoration:underline}
+.toc-l1{padding-left:0;font-weight:600}.toc-l2{padding-left:14px}.toc-l3{padding-left:28px}.toc-l4{padding-left:42px}
+.toc-l5{padding-left:56px}.toc-l6{padding-left:70px}.toc-l7{padding-left:84px;font-size:.92em}
+.md-code{position:relative;margin:0 0 .9em}
+.md-code pre{margin:0;padding-top:26px}
+.md-lang{position:absolute;left:12px;top:6px;font-size:10px;letter-spacing:.06em;text-transform:uppercase;color:#9aa4b8;pointer-events:none}
+.md-copy{position:absolute;right:8px;top:6px;font:inherit;font-size:11px;padding:2px 8px;border-radius:6px;cursor:pointer;
+  border:1px solid rgba(255,255,255,.2);background:rgba(255,255,255,.08);color:#d7dceb;opacity:0;transition:.15s}
+.md-code:hover .md-copy{opacity:1}
+.note-thumb .md-copy{display:none}
+.tk-k{color:#ff7ab2;font-weight:600}.tk-s{color:#a5e07a}.tk-c{color:#8b96a8;font-style:italic}.tk-n{color:#f8c555}.tk-f{color:#6cb6ff}
+.md-heading{height:30px;border-radius:8px;border:1px solid var(--stroke);background:rgba(255,255,255,.3);color:var(--text);font:inherit;font-size:13px;padding:0 6px}
+#mdOutlineBtn.active{background:var(--accent-soft)}
+.md-outline{display:none;width:230px;flex:none;border-radius:18px;padding:14px 10px;overflow:auto}
+.md-editor.outline-open .md-outline{display:block}
+.md-outline-title{font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);padding:0 8px 8px}
+.md-outline-list{display:flex;flex-direction:column;gap:1px}
+.md-outline-list button{text-align:left;border:0;background:none;color:var(--text);font:inherit;font-size:13px;padding:5px 8px;border-radius:8px;cursor:pointer;
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.md-outline-list button:hover{background:rgba(255,255,255,.35)}
+.md-outline-list button.toc-l1{font-weight:650}
+.md-outline-empty{font-size:12px;color:var(--muted);padding:0 8px}
 
 /* PDF export prints only the rendered note */
 #printArea{display:none}
@@ -552,6 +583,9 @@ body.editing{overflow:hidden}
   #printArea{display:block;color:#111;font-size:12pt}
   #printArea .md a{color:#1a4fd6}
   #printArea .md pre{background:#f4f4f4;color:#111;border:1px solid #ddd}
+  #printArea .md-copy{display:none}
+  #printArea .tk-k{color:#b0186b}#printArea .tk-s{color:#2a7a12}#printArea .tk-c{color:#6a737d}#printArea .tk-n{color:#9a5b00}#printArea .tk-f{color:#1a56c4}
+  #printArea .md-lang{color:#888}
   #printArea .md h1,#printArea .md h2,#printArea .md pre,#printArea .md table,#printArea .md img{break-inside:avoid}
 }
 
@@ -673,6 +707,8 @@ body.editing{overflow:hidden}
   <div class="md-bar glass">
     <button class="btn small ghost" id="mdBack" type="button" title="Back to notes (Esc)">&larr; Notes</button>
     <div class="md-title"><span id="mdName"></span><span id="mdDirty" class="md-dirty hidden" title="Unsaved changes">&#9679;</span></div>
+    <button class="btn small ghost" id="mdOutlineBtn" type="button" title="Show / hide outline (table of contents)">&#9776; Outline</button>
+    <select class="md-heading" id="mdHeading" title="Subject, paragraph or heading level H1–H7"></select>
     <div class="md-tools" id="mdTools"></div>
     <div class="seg" id="mdModes">
       <button type="button" data-mode="edit">Edit</button>
@@ -689,10 +725,16 @@ body.editing{overflow:hidden}
       </div>
     </div>
   </div>
+  <div class="md-main">
+  <aside class="md-outline glass" id="mdOutline">
+    <div class="md-outline-title">Outline</div>
+    <div class="md-outline-list" id="mdOutlineList"></div>
+  </aside>
   <div class="md-body glass" id="mdBody">
     <textarea id="mdInput" spellcheck="true" placeholder="# Title&#10;&#10;Write **Markdown** here…"></textarea>
     <div class="md-divider" id="mdDivider" title="Drag to resize · double-click to reset"></div>
     <div class="md-preview md" id="mdPreview"></div>
+  </div>
   </div>
 </div>
 <div id="printArea"></div>
@@ -711,6 +753,7 @@ const STORE_KEY = 'launchpad.v1';
 const BG_KEY = 'launchpad.bg';
 const NOTES_KEY = 'launchpad.notes';
 const SPLIT_KEY = 'launchpad.mdSplit';
+const OUTLINE_KEY = 'launchpad.mdOutline';
 const BG_MAX_SIDE = 1920;
 const ENVS_PER_PAGE = 2;
 const LAYOUT_VERSION = 2;
@@ -1667,12 +1710,60 @@ function mdInline(src) {
     .replace(/\n/g, '<br>');
   return s.replace(/\u0000(\d+)\u0000/g, (_, i) => stash[i]);
 }
+const HL_LANGS = {
+  sql: { c: /--[^\n]*|\/\*[\s\S]*?\*\//, s: /'(?:''|[^'])*'|"[^"\n]*"|\[[^\]\n]+\]/, ci: true,
+    kw: 'select from where and or not insert into values update set delete create alter drop table view index join inner left right full outer cross apply on as group by order having limit top distinct union all except intersect exists in is null like between case when then else end begin commit rollback transaction tran declare with over partition primary key foreign references default go exec execute procedure proc function returns return if while cast convert asc desc nolock merge using matched output truncate count sum avg min max coalesce isnull getdate varchar nvarchar int bigint decimal numeric date datetime bit char text' },
+  python: { c: /#[^\n]*/, s: /[rbfuRBFU]{0,2}"""[\s\S]*?"""|[rbfuRBFU]{0,2}'''[\s\S]*?'''|[rbfuRBFU]{0,2}"(?:\\.|[^"\\\n])*"|[rbfuRBFU]{0,2}'(?:\\.|[^'\\\n])*'/,
+    kw: 'def class return if elif else for while in not and or is None True False import from as with try except finally raise lambda yield pass break continue global nonlocal async await del assert self print len range' },
+  js: { c: /\/\/[^\n]*|\/\*[\s\S]*?\*\//, s: /"(?:\\.|[^"\\\n])*"|'(?:\\.|[^'\\\n])*'|`(?:\\.|[^`\\])*`/,
+    kw: 'const let var function return if else for while do switch case break continue new this class extends import export from default try catch finally throw typeof instanceof in of async await null undefined true false yield public private protected static void int string bool using namespace interface enum' },
+  bash: { c: /#[^\n]*/, s: /"(?:\\.|[^"\\])*"|'[^']*'/,
+    kw: 'if then else elif fi for while do done case esac in function return export local echo exit cd ls sudo' },
+  powershell: { c: /<#[\s\S]*?#>|#[^\n]*/, s: /"(?:`.|[^"`])*"|'(?:''|[^'])*'/, ci: true,
+    kw: 'function param if elseif else foreach for while do switch return try catch finally throw begin process end in write-host get-item set-item get-childitem import-module -eq -ne -gt -lt -ge -le -like -match -and -or -not $true $false $null' }
+};
+const HL_ALIAS = { javascript: 'js', ts: 'js', typescript: 'js', json: 'js', java: 'js', c: 'js', cpp: 'js', 'c++': 'js', cs: 'js', csharp: 'js', 'c#': 'js',
+  py: 'python', python3: 'python', tsql: 'sql', 't-sql': 'sql', mssql: 'sql', mysql: 'sql', postgres: 'sql', postgresql: 'sql', plsql: 'sql', sqlite: 'sql',
+  sh: 'bash', shell: 'bash', zsh: 'bash', ps: 'powershell', ps1: 'powershell', pwsh: 'powershell' };
+function highlight(code, lang) {
+  const key = String(lang || '').toLowerCase();
+  const h = HL_LANGS[HL_ALIAS[key] || key];
+  if (!h) return esc(code);
+  h.set = h.set || new Set(h.kw.split(' '));
+  h.re = h.re || new RegExp(`(${h.c.source})|(${h.s.source})|(\\b\\d+(?:\\.\\d+)?\\b)|([-$@]?[A-Za-z_][\\w$-]*)`, 'g' + (h.s.flags.includes('i') ? 'i' : ''));
+  let out = '';
+  let last = 0;
+  code.replace(h.re, (m, c, s, n, w, idx) => {
+    out += esc(code.slice(last, idx));
+    last = idx + m.length;
+    if (c) out += `<span class="tk-c">${esc(m)}</span>`;
+    else if (s) out += `<span class="tk-s">${esc(m)}</span>`;
+    else if (n) out += `<span class="tk-n">${esc(m)}</span>`;
+    else if (h.set.has(h.ci ? w.toLowerCase() : w)) out += `<span class="tk-k">${esc(m)}</span>`;
+    else if (code[last] === '(') out += `<span class="tk-f">${esc(m)}</span>`;
+    else out += esc(m);
+    return m;
+  });
+  return out + esc(code.slice(last));
+}
+let mdHeadings = [];
+let mdSlugs = {};
+function headingId(html) {
+  const base = slug(html) || 'section';
+  const n = mdSlugs[base] = (mdSlugs[base] || 0) + 1;
+  return n === 1 ? base : `${base}-${n}`;
+}
+function tocHtml() {
+  if (!mdHeadings.length) return '<nav class="md-toc"><em>No headings yet</em></nav>';
+  return `<nav class="md-toc">${mdHeadings.map((h) =>
+    `<a href="#${esc(h.id)}" class="toc-l${h.level}">${h.html.replace(/<\/?a\b[^>]*>/g, '')}</a>`).join('')}</nav>`;
+}
 const MD_FENCE = /^ {0,3}(`{3,}|~{3,})\s*([\w+#.-]*)/;
 const MD_LIST = /^( *)([-*+]|\d+[.)])\s+(.*)$/;
 const MD_TABLE_SEP = /^\s*\|?\s*:?-+:?\s*(\|\s*:?-+:?\s*)*\|?\s*$/;
 function mdIsBlockStart(lines, i) {
   const l = lines[i];
-  return MD_FENCE.test(l) || /^ {0,3}#{1,6}\s/.test(l) || /^ {0,3}>/.test(l) || MD_LIST.test(l) ||
+  return MD_FENCE.test(l) || /^ {0,3}#{1,7}\s/.test(l) || /^\s*\[toc\]\s*$/i.test(l) || /^ {0,3}>/.test(l) || MD_LIST.test(l) ||
     /^ {0,3}([-*_])(\s*\1){2,}\s*$/.test(l) ||
     (l.includes('|') && i + 1 < lines.length && MD_TABLE_SEP.test(lines[i + 1]));
 }
@@ -1731,15 +1822,25 @@ function mdBlocks(lines) {
       const fence = m[1];
       const buf = [];
       i++;
-      while (i < lines.length && !lines[i].trim().startsWith(fence)) buf.push(lines[i++]);
+      const close = new RegExp(`^ {0,3}${fence[0] === '`' ? '`' : '~'}{${fence.length},}\\s*$`);
+      while (i < lines.length && !close.test(lines[i])) buf.push(lines[i++]);
       i++;
-      out += `<pre><code${m[2] ? ` class="lang-${esc(m[2])}"` : ''}>${esc(buf.join('\n'))}</code></pre>`;
+      const lang = m[2];
+      out += `<div class="md-code">${lang ? `<span class="md-lang">${esc(lang)}</span>` : ''}` +
+        `<button type="button" class="md-copy" title="Copy code">Copy</button>` +
+        `<pre><code${lang ? ` class="lang-${esc(lang)}"` : ''}>${highlight(buf.join('\n'), lang)}</code></pre></div>`;
       continue;
     }
-    m = line.match(/^ {0,3}(#{1,6})\s+(.*?)\s*#*\s*$/);
-    if (m) {
+    if (/^\s*\[toc\]\s*$/i.test(line)) { out += '<div class="md-toc-slot"></div>'; i++; continue; }
+    m = line.match(/^ {0,3}(#{1,7})(?:\s+(.*?))?\s*#*\s*$/);
+    if (m && m[2] !== undefined) {
+      const level = m[1].length;
       const html = mdInline(m[2]);
-      out += `<h${m[1].length} id="${esc(slug(html))}">${html}</h${m[1].length}>`;
+      const id = headingId(html);
+      mdHeadings.push({ level, id, html });
+      out += level === 7
+        ? `<div class="h7" role="heading" aria-level="7" id="${esc(id)}">${html}</div>`
+        : `<h${level} id="${esc(id)}">${html}</h${level}>`;
       i++;
       continue;
     }
@@ -1777,8 +1878,29 @@ function mdBlocks(lines) {
   }
   return out;
 }
+function mdFrontMatter(text) {
+  const fm = text.match(/^---\n([\s\S]*?)\n(?:---|\.\.\.)[ \t]*(?:\n|$)/);
+  if (!fm) return { meta: null, body: text };
+  const meta = {};
+  fm[1].split('\n').forEach((l) => {
+    const m = l.match(/^\s*([\w-]+)\s*:\s*(.*)$/);
+    if (m) meta[m[1].toLowerCase()] = m[2].trim().replace(/^(["'])(.*)\1$/, '$2');
+  });
+  return { meta, body: text.slice(fm[0].length) };
+}
 function mdToHtml(src) {
-  return mdBlocks(String(src || '').replace(/\r\n?/g, '\n').replace(/\t/g, '    ').split('\n'));
+  const { meta, body } = mdFrontMatter(String(src || '').replace(/\r\n?/g, '\n').replace(/\t/g, '    '));
+  mdHeadings = [];
+  mdSlugs = {};
+  let head = '';
+  if (meta) {
+    const subject = meta.subject || meta.title;
+    const info = ['author', 'date', 'tags'].filter((k) => meta[k]).map((k) => esc(meta[k])).join(' · ');
+    if (subject) head += `<div class="md-subject">${mdInline(subject)}</div>`;
+    if (info) head += `<div class="md-meta">${info}</div>`;
+  }
+  const html = mdBlocks(body.split('\n'));
+  return head + html.replace(/<div class="md-toc-slot"><\/div>/g, tocHtml);
 }
 
 /* ---------- notes (markdown files kept in their own storage key) ---------- */
@@ -1931,8 +2053,92 @@ function updatePreview() {
   previewFrame = requestAnimationFrame(() => {
     $('#mdPreview').innerHTML = mdToHtml($('#mdInput').value) ||
       '<p class="md-placeholder">Start typing Markdown on the left — the preview appears here.</p>';
+    renderOutline(mdHeadings);
     updateEditorTitle();
   });
+}
+function renderOutline(heads) {
+  const box = $('#mdOutlineList');
+  box.innerHTML = heads.length ? '' : '<div class="md-outline-empty">Add headings (# to #######) to build the outline.</div>';
+  heads.forEach((h, k) => {
+    const a = el('button', `toc-l${h.level}`, h.html.replace(/<\/?a\b[^>]*>/g, ''));
+    a.type = 'button';
+    a.addEventListener('click', () => jumpToHeading(h.id, k));
+    box.appendChild(a);
+  });
+}
+function headingLines(text) {
+  const out = [];
+  let fence = null;
+  text.split('\n').forEach((l, n) => {
+    const f = l.match(/^ {0,3}(`{3,}|~{3,})/);
+    if (f) {
+      if (!fence) fence = f[1];
+      else if (f[1][0] === fence[0] && f[1].length >= fence.length) fence = null;
+      return;
+    }
+    if (!fence && /^ {0,3}#{1,7}\s+\S/.test(l)) out.push(n);
+  });
+  return out;
+}
+function jumpToHeading(id, k) {
+  if (editor.mode !== 'edit') {
+    $('#mdPreview').querySelector(`[id="${CSS.escape(id)}"]`)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+  if (editor.mode === 'read') return;
+  const ta = $('#mdInput');
+  const lines = ta.value.split('\n');
+  const n = headingLines(ta.value)[k];
+  if (n === undefined) return;
+  const pos = lines.slice(0, n).reduce((a, l) => a + l.length + 1, 0);
+  ta.focus({ preventScroll: true });
+  ta.setSelectionRange(pos, pos + lines[n].length);
+  if (editor.mode === 'edit') ta.scrollTop = (n / Math.max(1, lines.length)) * ta.scrollHeight - 40;
+}
+function setOutline(open) {
+  $('#mdEditor').classList.toggle('outline-open', open);
+  $('#mdOutlineBtn').classList.toggle('active', open);
+  localStorage.setItem(OUTLINE_KEY, open ? '1' : '0');
+}
+function setHeading(level) {
+  const ta = $('#mdInput');
+  const { value } = ta;
+  const s = value.lastIndexOf('\n', ta.selectionStart - 1) + 1;
+  let e = value.indexOf('\n', ta.selectionEnd);
+  if (e < 0) e = value.length;
+  const block = value.slice(s, e).split('\n')
+    .map((l) => (level ? '#'.repeat(level) + ' ' : '') + l.replace(/^ {0,3}#{1,7}\s*/, '')).join('\n');
+  ta.setRangeText(block, s, e, 'end');
+  ta.focus(); updatePreview();
+}
+function setSubject() {
+  const ta = $('#mdInput');
+  let { value } = ta;
+  const s = value.lastIndexOf('\n', ta.selectionStart - 1) + 1;
+  let e = value.indexOf('\n', ta.selectionEnd);
+  if (e < 0) e = value.length;
+  const picked = value.slice(ta.selectionStart, ta.selectionEnd).trim();
+  const lineText = value.slice(s, e).replace(/^ {0,3}#{1,7}\s*/, '').trim();
+  const { meta } = mdFrontMatter(value);
+  const inFront = meta && s < value.indexOf('\n---', 3) + 4;
+  const subject = picked || (!inFront && lineText) || prompt('Subject', meta?.subject || meta?.title || '') || '';
+  if (!subject) return;
+  if (!picked && !inFront && lineText) value = value.slice(0, s) + value.slice(e + (e < value.length ? 1 : 0));
+  const line = `subject: ${subject.replace(/\n/g, ' ')}`;
+  if (meta) {
+    const end = value.indexOf('\n', value.indexOf('\n---', 3) + 1);
+    const fm = value.slice(0, end < 0 ? value.length : end);
+    const rest = value.slice(fm.length);
+    const next = /^\s*(subject|title)\s*:.*$/im.test(fm)
+      ? fm.replace(/^\s*(subject|title)\s*:.*$/im, line)
+      : fm.replace(/^---\n/, `---\n${line}\n`);
+    value = next + rest;
+  } else {
+    value = `---\n${line}\n---\n\n` + value.replace(/^\n+/, '');
+  }
+  ta.value = value;
+  ta.setSelectionRange(0, 0);
+  ta.focus(); updatePreview();
 }
 function applySplit(pct) {
   const p = Math.min(85, Math.max(15, pct));
@@ -2005,7 +2211,12 @@ function prefixLines(prefix) {
   ta.focus(); updatePreview();
 }
 const MD_TOOLS = {
-  h1: () => prefixLines('# '), h2: () => prefixLines('## '),
+  toc: () => wrapSelection('\n[TOC]\n', '', ''),
+  codeblock: () => {
+    const lang = prompt('Code language (e.g. sql, python, js, powershell) — leave blank for plain text', 'sql');
+    if (lang === null) return;
+    wrapSelection('\n```' + lang.trim() + '\n', '\n```\n', 'code');
+  },
   bold: () => wrapSelection('**'), italic: () => wrapSelection('*'), strike: () => wrapSelection('~~'),
   code: () => wrapSelection('`', '`', 'code'),
   link: () => wrapSelection('[', '](https://)', 'link text'),
@@ -2172,11 +2383,36 @@ $('#mdModes').addEventListener('click', (e) => {
   if (m) setEditorMode(m);
 });
 $('#mdTools').innerHTML = [
-  ['h1', 'H1', 'Heading 1'], ['h2', 'H2', 'Heading 2'], ['bold', '<b>B</b>', 'Bold (Ctrl+B)'],
+  ['toc', 'TOC', 'Insert table of contents [TOC]'], ['bold', '<b>B</b>', 'Bold (Ctrl+B)'],
   ['italic', '<i>I</i>', 'Italic (Ctrl+I)'], ['strike', '<s>S</s>', 'Strikethrough'], ['code', '&lt;/&gt;', 'Inline code'],
-  ['link', '&#128279;', 'Link (Ctrl+K)'], ['ul', '&bull;', 'Bulleted list'], ['ol', '1.', 'Numbered list'],
+  ['codeblock', '{ }', 'Code block (Ctrl+Shift+K)'], ['link', '&#128279;', 'Link (Ctrl+K)'], ['ul', '&bull;', 'Bulleted list'], ['ol', '1.', 'Numbered list'],
   ['task', '&#9744;', 'Task list'], ['quote', '&ldquo;', 'Quote'], ['table', '&#9638;', 'Table'], ['hr', '&mdash;', 'Divider']
 ].map(([t, label, title]) => `<button type="button" data-t="${t}" title="${title}">${label}</button>`).join('');
+$('#mdHeading').innerHTML = '<option value="" disabled selected>Heading</option><option value="0">Paragraph (Ctrl+0)</option>' +
+  '<option value="subject">Subject</option>' +
+  [1, 2, 3, 4, 5, 6, 7].map((n) => `<option value="${n}">H${n} (Ctrl+${n})</option>`).join('');
+$('#mdHeading').addEventListener('change', (e) => {
+  const v = e.target.value;
+  e.target.value = '';
+  if (v === 'subject') setSubject();
+  else setHeading(Number(v));
+});
+$('#mdOutlineBtn').addEventListener('click', () => setOutline(!$('#mdEditor').classList.contains('outline-open')));
+setOutline(localStorage.getItem(OUTLINE_KEY) === '1');
+$('#mdPreview').addEventListener('click', (e) => {
+  const btn = e.target.closest('.md-copy');
+  if (!btn) return;
+  const code = btn.parentElement.querySelector('code').textContent;
+  (navigator.clipboard?.writeText(code) || Promise.reject()).then(() => toast('Code copied'), () => {
+    const t = el('textarea');
+    t.value = code;
+    document.body.appendChild(t);
+    t.select();
+    document.execCommand('copy');
+    t.remove();
+    toast('Code copied');
+  });
+});
 $('#mdTools').addEventListener('click', (e) => {
   const t = e.target.closest('button')?.dataset.t;
   if (t) MD_TOOLS[t]();
@@ -2187,7 +2423,9 @@ $('#mdInput').addEventListener('keydown', (e) => {
   if ((e.ctrlKey || e.metaKey) && !e.shiftKey) {
     const k = { b: 'bold', i: 'italic', k: 'link' }[e.key.toLowerCase()];
     if (k) { e.preventDefault(); MD_TOOLS[k](); }
+    if (/^[0-7]$/.test(e.key)) { e.preventDefault(); setHeading(Number(e.key)); }
   }
+  if ((e.ctrlKey || e.metaKey) && e.shiftKey && e.key.toLowerCase() === 'k') { e.preventDefault(); MD_TOOLS.codeblock(); }
 });
 $('#mdInput').addEventListener('scroll', () => {
   if (editor?.mode !== 'split') return;
