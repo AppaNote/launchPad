@@ -15,8 +15,9 @@
     <button class="tab active" data-view="launcher" data-icon="grid" title="Launcher" aria-label="Launcher">Launcher</button>
     <button class="tab" data-view="databases" data-icon="database" title="Databases" aria-label="Databases">Databases</button>
     <button class="tab" data-view="resources" data-icon="book" title="Resources" aria-label="Resources">Resources</button>
+    <button class="tab" data-view="notes" data-icon="note" title="Notes" aria-label="Notes">Notes</button>
   </nav>
-  <button class="tab" id="settingsBtn" type="button" title="Appearance" aria-label="Appearance"></button>
+  <button class="tab" id="settingsBtn" type="button" title="Settings & backup" aria-label="Settings and backup"></button>
 
   <div class="appearance glass" id="appearance">
     <div class="menu-label">Theme</div>
@@ -31,6 +32,11 @@
       <span>Blur</span>
       <input type="range" id="bgBlur" min="0" max="24" step="1" />
     </label>
+    <div class="menu-label">Backup</div>
+    <div class="bg-actions">
+      <button class="btn small" id="bkExport" type="button" title="Download every link, database, resource and note as one .json file">Export</button>
+      <button class="btn small" id="bkImport" type="button" title="Restore from a .json backup">Import</button>
+    </div>
   </div>
 </aside>
 
@@ -77,6 +83,16 @@
     <div class="cards" id="dbList"></div>
   </section>
 
+  <!-- NOTES -->
+  <section class="view hidden" id="view-notes">
+    <div class="notes-head">
+      <span class="hint">Markdown files saved in this browser. Drop .md files here to add them.</span>
+      <button class="btn small" id="openMd" type="button">Open .md file…</button>
+    </div>
+    <div class="notes-grid" id="notesList"></div>
+    <div class="empty hidden" id="notesEmpty">No notes yet — press + to write one.</div>
+  </section>
+
   <!-- RESOURCES -->
   <section class="view hidden" id="view-resources">
     <div class="filters" id="resFilters"></div>
@@ -101,7 +117,37 @@
   </div>
 </div>
 
+<!-- Markdown editor -->
+<div class="md-editor hidden" id="mdEditor" data-mode="split">
+  <div class="md-bar glass">
+    <button class="btn small ghost" id="mdBack" type="button" title="Back to notes (Esc)">&larr; Notes</button>
+    <div class="md-title"><span id="mdName"></span><span id="mdDirty" class="md-dirty hidden" title="Unsaved changes">&#9679;</span></div>
+    <div class="md-tools" id="mdTools"></div>
+    <div class="seg" id="mdModes">
+      <button type="button" data-mode="edit">Edit</button>
+      <button type="button" data-mode="split">Split</button>
+      <button type="button" data-mode="read">Read</button>
+    </div>
+    <button class="btn small primary" id="mdSave" type="button" title="Save (Ctrl+S)">Save</button>
+    <button class="btn small" id="mdSaveAs" type="button" title="Save As (Ctrl+Shift+S)">Save As</button>
+    <div class="menu-wrap">
+      <button class="btn small" id="mdExportBtn" type="button">Export &#9662;</button>
+      <div class="menu glass hidden" id="mdExportMenu">
+        <button type="button" data-x="pdf">PDF (.pdf)</button>
+        <button type="button" data-x="md">Markdown (.md)</button>
+      </div>
+    </div>
+  </div>
+  <div class="md-body glass" id="mdBody">
+    <textarea id="mdInput" spellcheck="true" placeholder="# Title&#10;&#10;Write **Markdown** here…"></textarea>
+    <div class="md-divider" id="mdDivider" title="Drag to resize · double-click to reset"></div>
+    <div class="md-preview md" id="mdPreview"></div>
+  </div>
+</div>
+<div id="printArea"></div>
+
 <div id="toast" class="toast hidden"></div>
+<input type="file" id="mdFile" accept=".md,.markdown,.mdown,.txt,text/markdown,text/plain" multiple class="hidden" />
 <input type="file" id="importFile" accept="application/json" class="hidden" />
 <input type="file" id="bgFile" accept="image/*" class="hidden" />
 
